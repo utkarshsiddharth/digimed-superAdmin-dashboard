@@ -1,0 +1,78 @@
+@import 'yet-another-react-lightbox/styles.css';
+@import './assets/css/icons.css';
+@import "./assets/scss/variables"; //
+@import "./assets/scss/switcher";
+
+@import "./assets/css/styles.css";
+@import "react-datepicker/dist/react-datepicker.css"; //datepicker
+@import "suneditor/dist/css/suneditor.min.css"; //suneditor Css
+@import 'react-perfect-scrollbar/dist/css/styles.css'; //perfectscrollbar
+
+//simonwep colorpicker
+@import "@simonwep/pickr/dist/themes/classic.min.css";
+@import "@simonwep/pickr/dist/themes/monolith.min.css";
+@import "@simonwep/pickr/dist/themes/nano.min.css";
+
+@import "react-tabulator/lib/styles.css"; // default theme
+@import "react-tabulator/css/bootstrap/tabulator_bootstrap.min.css"; // use Theme(s)
+@import "react-tabulator/lib/css/bootstrap/tabulator_bootstrap.min.css";
+
+@import 'filepond/dist/filepond.min.css'; // filepond
+@import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"; // filepond
+
+@import 'leaflet/dist/leaflet.css';
+//leaflet
+// html{
+//     zoom: 80%;
+// }
+.page-item.active .page-link {
+    color: #fff;
+    background-color: #35aa33;
+    border-color: #35aa33;
+}
+.watermark-footer {
+    position: fixed;
+    top: 90%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    pointer-events: none;
+  }
+  
+  .watermark-image {
+    max-height: 450px;
+    max-width: 100%;
+    opacity: 0.5;
+  }
+  .btn-gray{
+    background-color: #c6c7c8;
+  }
+  html {
+    zoom: 80%;
+  }
+    /* Ensure the backdrop covers the entire screen */
+.modal-backdrop.show {
+  opacity: var(--bs-backdrop-opacity); /* Adjust opacity as needed */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.vjwEXnTmP6jAK8LlvWL_ .QeMJj1LEulq1ApqLHxuM {
+  width: 82px;
+  display: none !important;
+  background-color: #e8543b ;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAMAAAANIilAAAAAAXNSR0IArs4c6QAAAXpQTFRFAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////02MLIAAAAH10Uk5TAAECAwQFBggLDA0ODxAREhQWGxwdISMoKSorLzIzNDY4PD5ARkdLT1FUVVlbXF5gY2VmaGlqbG5vcnR1dnh5fH2DhYmLjI2QkZOVlpeanZ6foKGnqKuztLa3ubrAxcfMzc7Q0dPW2Nrb4eTm5+jp7O3u8PHz9vf4+fr7/f7azg/OAAABQ0lEQVQYGe3BVUPCABgF0AtiYGF3dxc22N2d2N2Jife/O8Hgm5vggz7tHBgMBsPfseVV1Te2tDk7myuL0iMQtOSm2Y1LCucrPaUJCCS0eOiAOo6HC8zQF999yh9djKRAW8b0AwPyLOTgO+vgM4PyMhkHlfITBu2qHP5Cxvgr/SH4ZF3mL81Z8C56m2qe3SlHRX5aUlxiakHNgOuOajPwMbuoslFrg2CtPqBKA7zaKF1X4buwMUq3NihibijcZ0OLaZWSAwo7pVFoK6S0BMUUpTposzxS2IFillIXdFxScEExTmke2sweChNQ2CmtQ1skpSYosihtQscZhUy8OaQwDB1O+juEl5P+9mOhw9Tu5hc7vMKP+Om8Lxb64ju2XuizZoFPrptvrhcd2SYEYCvpnNtzPy1E4UNSa297WQoMBoPh/70Czcpmk5XbIaYAAAAASUVORK5CYII=);
+}
+.JtRS8dNV0vDLnpBoA6kZ>div {
+  width: 42px;
+  height: 42px;
+  background-color: #313443;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 28px 28px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: none !important;
+}
