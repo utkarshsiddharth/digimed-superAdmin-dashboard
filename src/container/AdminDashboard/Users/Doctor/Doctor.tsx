@@ -18,7 +18,7 @@ import {
   useDoctorkListQuery,
   useDoctorksingalDataQuery,
   useUpdateDoctorProfileMutation,
-} from "../../../../redux/api/admin";
+} from "../../../../redux/api/superAdmin";
 import AnimatedLogo from "../../../../components/AnimatedLogo";
 import { useForm } from "react-hook-form";
 
@@ -27,12 +27,15 @@ const Doctor = ({ SearchData }: any) => {
   const [modalShow, setModalShow] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [showpass, setShowpass] = useState(false);
-  const { data, isLoading, refetch } = useDoctorkListQuery("doctors");
+  const [suspendedId,setSuspendedId] = useState<any>("")
   const [doctorActive] = useActiveStatusMutation();
   const [updateDoctorProfile] = useUpdateDoctorProfileMutation();
   const [changeStatus, { isLoading: changeLoading }] = useActiveStatusMutation()
-  const [cpagination, setCpagination] = useState(1);
-  const recordsPerPage = 5;
+  const [kiosksList, setKioskList] = useState([]);
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
   const [, setProfileData] = useState({});
   const {
     data: sinaglData,
@@ -42,12 +45,39 @@ const Doctor = ({ SearchData }: any) => {
     data: "doctors",
     selectedId,
   });
+  const { data, isLoading, refetch } = useDoctorkListQuery( { page,
+    limit,type:"doctors"});
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
   } = useForm();
+
+
+
+
+  useEffect(() => {
+    if (data) {
+      setKioskList(data?.data?.data);
+      const totalPatients = data?.data?.total || 0;
+      setTotalPages(Math.ceil(totalPatients / limit));
+    }
+  }, [data]);
+
+  // pagination
+  const handlePrevious = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
+  const handleNext = () => {
+    if (page < totalPages) {
+      setPage(page + 1);
+    }
+  };
+
+
   useEffect(() => {
     if (isSuccess) {
       console.log(sinaglData)
@@ -63,7 +93,7 @@ const Doctor = ({ SearchData }: any) => {
       setValue("mobile_number", sinaglData?.data?.mobile_number || "");
       setValue("site", sinaglData?.data?.site || "");
       setValue("user_name", sinaglData?.data?.user_name || "");
-      setValue("password", sinaglData?.data?.password || "");
+      setValue("password", "");
       setValue("biography", sinaglData?.data?.biography || "");
       if (
         sinaglData?.data?.professional_details &&
@@ -99,15 +129,16 @@ const Doctor = ({ SearchData }: any) => {
 
 
 
+  const handleClose = () => setShowConfirm(false);
 
 
-
-  const handlStatus = async (idx: any) => {
-    const statusData = { "user_type": "doctor", "status": idx?.resume_suspended_status === "active" ? "suspended" : "active" }
+  const handlStatus = async () => {
+    setShowConfirm(true)
+    const statusData = { "user_type": "doctor", "status": suspendedId?.resume_suspended_status === "active" ? "suspended" : "active" }
 
     try {
-      const response = await changeStatus({ statusData, userStatus: idx?._id });
-      console.log("jfgjhdf dsgjf", response)
+      const response = await changeStatus({ statusData, userStatus: suspendedId?._id });
+      setShowConfirm(false)
       if (changeLoading) {
         return
       }
@@ -127,26 +158,7 @@ const Doctor = ({ SearchData }: any) => {
   }
 
 
-  const [searchmodalShow, setSearchModalShow] = useState(false);
-  const totalRecords = data?.data?.data?.length ?? 0;
-  const lastIndex = cpagination * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
-  const records = data?.data?.data?.slice(firstIndex, lastIndex);
-  const npage = Math.ceil(totalRecords / recordsPerPage);
-  const number = [...Array(npage).keys()].map((num) => num + 1);
-  function prePage() {
-    if (cpagination > 1) {
-      setCpagination(cpagination - 1);
-    }
-  }
-  function changeCpage(id: any) {
-    setCpagination(id);
-  }
-  function nextPage() {
-    if (cpagination < npage) {
-      setCpagination(cpagination + 1);
-    }
-  }
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [iconState, setIconState] = useState({ user_type: "", status: "" });
   const [, setStorActive] = useState({ user_type: "", status: "" });
@@ -364,31 +376,7 @@ const Doctor = ({ SearchData }: any) => {
                       required: "Password is required",
                     })}
                   />
-                  <Button
-                    className="border-0 bg-bluee rounded-2 py-2 fw-semibold fs-6 text-fixed-white"
-                    onClick={() => setShowpass(!showpass)}
-                  >
-                    {showpass ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M12 9a3.02 3.02 0 0 0-3 3c0 1.642 1.358 3 3 3 1.641 0 3-1.358 3-3 0-1.641-1.359-3-3-3z"></path>
-                        <path d="M12 5c-7.633 0-9.927 6.617-9.948 6.684L1.946 12l.105.316C2.073 12.383 4.367 19 12 19s9.927-6.617 9.948-6.684l.106-.316-.105-.316C21.927 11.617 19.633 5 12 5zm0 12c-5.351 0-7.424-3.846-7.926-5C4.578 10.842 6.652 7 12 7c5.351 0 7.424 3.846 7.926 5-.504 1.158-2.578 5-7.926 5z"></path>
-                      </svg>
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M12 19c.946 0 1.81-.103 2.598-.281l-1.757-1.757c-.273.021-.55.038-.841.038-5.351 0-7.424-3.846-7.926-5a8.642 8.642 0 0 1 1.508-2.297L4.184 8.305c-1.538 1.667-2.121 3.346-2.132 3.379a.994.994 0 0 0 0 .633C2.073 12.383 4.367 19 12 19zm0-14c-1.837 0-3.346.396-4.604.981L3.707 2.293 2.293 3.707l18 18 1.414-1.414-3.319-3.319c2.614-1.951 3.547-4.615 3.561-4.657a.994.994 0 0 0 0-.633C21.927 11.617 19.633 5 12 5zm4.972 10.558-2.28-2.28c.19-.39.308-.819.308-1.278 0-1.641-1.359-3-3-3-.459 0-.888.118-1.277.309L8.915 7.501A9.26 9.26 0 0 1 12 7c5.351 0 7.424 3.846 7.926 5-.302.692-1.166 2.342-2.954 3.558z"></path>
-                      </svg>
-                    )}
-                  </Button>
+                 
                 </InputGroup>
               </Col>
               <Col md={6}>
@@ -527,7 +515,7 @@ const Doctor = ({ SearchData }: any) => {
                 {SearchData ? (
                   SearchData.map((item: any, index: number) => (
                     <tr key={index} className="">
-                      <td scope="row">{index + 1}.</td>
+                      <td scope="row">  {(page - 1) * limit + index + 1}.</td>
                       <td>{item?.first_name}</td>
                       <td>
                         <div className="d-flex align-items-center">
@@ -538,23 +526,20 @@ const Doctor = ({ SearchData }: any) => {
                         <span className="">{item?.mobile_number}</span>
                       </td>
                       <td className="d-flex gap-3">
-                        <span
-                          className=""
-                          onClick={() => {
-                            setActive(item?._id);
-                          }}
-                        >
-                          {isPlaying ? (
-                            <i
-                              className="bi bi-pause-circle fs-3"
-                              onClick={handleActive}
-                            ></i>
-                          ) : (
-                            <i
-                              className="bi bi-play-circle fs-3"
-                              onClick={handleActive}
-                            ></i>
-                          )}
+                      <span onClick={() => {
+                     setShowConfirm(true)
+                     setSuspendedId(item)
+
+
+                        }}>
+
+                          {
+                            item?.resume_suspended_status === "active" ? (
+                              <i className="bi bi-play-circle fs-3"></i>
+                            ) : (
+                              <i className="bi bi-pause-circle fs-3"></i>
+                            )
+                          }
                         </span>
                         <span
                           className=""
@@ -569,9 +554,9 @@ const Doctor = ({ SearchData }: any) => {
                     </tr>
                   ))
                 ) : data ? (
-                  records.map((idx: any, index: any) => (
+                  kiosksList?.map((idx: any, index: any) => (
                     <tr key={index} className="">
-                      <td>{index + 1}.</td>
+                      <td>  {(page - 1) * limit + index + 1}.</td>
                       <td scope="row">{idx.first_name}</td>
                       <td>
                         <div className="d-flex align-items-center">
@@ -583,7 +568,8 @@ const Doctor = ({ SearchData }: any) => {
                       </td>
                       <td className="d-flex gap-3">
                         <span onClick={() => {
-                          handlStatus(idx);
+                            setShowConfirm(true)
+                            setSuspendedId(idx)
 
 
                         }}>
@@ -613,34 +599,81 @@ const Doctor = ({ SearchData }: any) => {
                 )}
               </tbody>
             </Table>
+            <Modal show={showConfirm} onHide={handleClose} centered 
+              backdrop ={"static"}
+              animation={false}
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>Confirm Action</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                 <h5> Are you sure you want to suspend this doctor?</h5>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={handleClose}>
+                    Cancel
+                  </Button>
+                  <Button variant="danger" onClick={handlStatus} >
+                    Confirm
+                  </Button>
+                </Modal.Footer>
+              </Modal>
           </CardBody>
+          <CardFooter className="d-flex justify-content-end align-items-center">
+              {kiosksList?.length > 0 && (
+                <nav aria-label="Page navigation">
+                  <Pagination className="justify-content-end m-2">
+                    <Pagination.Item
+                      onClick={handlePrevious}
+                      disabled={page <= 1}
+                      active={page > 1 ? true : false}
+                    >
+                      Previous
+                    </Pagination.Item>
+                    {page > 3 && (
+                      <>
+                        <Pagination.Item onClick={() => setPage(1)}>
+                          1
+                        </Pagination.Item>
+                        <Pagination.Item disabled>...</Pagination.Item>
+                      </>
+                    )}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .slice(
+                        Math.max(0, page - 3),
+                        Math.min(totalPages, page + 2)
+                      )
+                      .map((pageNumber) => (
+                        <Pagination.Item
+                          key={pageNumber}
+                          active={pageNumber === page}
+                          onClick={() => setPage(pageNumber)}
+                        >
+                          {pageNumber}
+                        </Pagination.Item>
+                      ))}
+                    {page < totalPages - 2 && (
+                      <>
+                        <Pagination.Item disabled>...</Pagination.Item>
+                        <Pagination.Item onClick={() => setPage(totalPages)}>
+                          {totalPages}
+                        </Pagination.Item>
+                      </>
+                    )}
+                    <Pagination.Item
+                      onClick={handleNext}
+                      disabled={page >= totalPages}
+                      active={page < totalPages ? true : false}
+                    >
+                      Next
+                    </Pagination.Item>
+                  </Pagination>
+                </nav>
+              )}
+            </CardFooter>
         </div>
 
-        <CardFooter className="d-flex justify-content-between align-items-center">
-          <div className="fs-15 fw-bold mt-3">
-            Showing {firstIndex + 1} to {lastIndex} of {totalRecords} Entries
-          </div>
-          <Pagination className="m-0">
-            <Pagination.Prev onClick={prePage} disabled={cpagination === 1}>
-              Previous
-            </Pagination.Prev>
-            {number.map((n) => (
-              <Pagination.Item
-                key={n}
-                active={n === cpagination}
-                onClick={() => changeCpage(n)}
-              >
-                {n}
-              </Pagination.Item>
-            ))}
-            <Pagination.Next
-              onClick={nextPage}
-              disabled={cpagination === npage}
-            >
-              Next
-            </Pagination.Next>
-          </Pagination>
-        </CardFooter>
+       
       </Card>
     </Fragment>
   );

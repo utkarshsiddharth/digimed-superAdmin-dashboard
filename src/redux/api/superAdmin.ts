@@ -2,9 +2,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 // import Patientwating from "../../container/koisedashboards/Findpetient/patientwait/Patientwating";
 
-export const AdminApi = createApi({
-  reducerPath: "admin",
-  tagTypes: ["AdminApi", "deletetest"],
+export const SuperAdmin = createApi({
+  reducerPath: "superAdmin",
+  tagTypes: ["SuperAdmin", "deletetest"],
   baseQuery: fetchBaseQuery({
     baseUrl: "https://digi-med-backend.onrender.com",
     // baseUrl: "https://shatayu.online",
@@ -20,93 +20,112 @@ export const AdminApi = createApi({
   endpoints: (builder) => ({
     // kiosk list data
     kioskList: builder.query({
-      query: (data) => ({
-        url: `/admin/get_doctors_or_kiosk_lists?type=${data}`,
+      query: ({ page, limit, type }) => ({
+        url: `/superAdmin/get_doctors_or_kiosk_lists?page=${page}&limit=${limit}&type=${type}`,
         method: "GET",
       }),
+      providesTags:["SuperAdmin"],
     }),
     doctorkList: builder.query({
-      query: (data) => ({
-        url: `/admin/get_doctors_or_kiosk_lists?type=${data}`,
+      query: ({page, limit, type }) => ({
+        url: `/superAdmin/get_doctors_or_kiosk_lists?page=${page}&limit=${limit}&type=${type}`,
         method: "GET",
       }),
+      providesTags:["SuperAdmin"],
+    }),
+    
+   organizationkList: builder.query({
+      query: ({ page, limit, key }) => ({
+        url: `/superAdmin/getOrganizations?key=${key}&page=${page}&limit=${limit}`,
+        method: "GET",
+      }),
+      providesTags:["SuperAdmin"],
     }),
     doctorksingalData: builder.query({
       query: ({ selectedId, data }) => ({
-        url: `/admin/getDoctorOrKioksDataById?type=${data}&id=${selectedId}`,
+        url: `/superAdmin/getDoctorOrKioksDataById?type=${data}&id=${selectedId}`,
         // /admin/getDoctorOrKioksDataById?type=kiosks&id=6645c182821e914245ccf085.
         method: "GET",
       }),
+      providesTags:["SuperAdmin"],
     }),
     // update doctor Profile?
     updateDoctorProfile: builder.mutation({
       query: ({ selectedId, formData }) => {
         // Initialize FormData object
         return {
-          url: `/admin/update_doctor/${selectedId}`,
+          url: `/superAdmin/update_doctor/${selectedId}`,
           method: "PATCH",
           body: formData,
         };
       },
-      invalidatesTags: ["AdminApi"],
+      invalidatesTags: ["SuperAdmin"],
     }),
     updateKioskProfileData: builder.mutation({
       query: ({ selectedId, formData }) => {
         // Initialize FormData object
         return {
-          url: `/admin/update_kiosk/${selectedId}`,
+          url: `/superAdmin/update_kiosk/${selectedId}`,
           method: "PATCH",
           body: formData,
         };
       },
-      invalidatesTags: ["AdminApi"],
+      invalidatesTags: ["SuperAdmin"],
     }),
     searchItem: builder.query({
       query: ({ inputValue, dataSearch, selectedLocation }) => ({
-        url: `/admin/get_doctors_or_kiosks_by_regex?type=${dataSearch}s&key1=${selectedLocation}&key2=${inputValue}`,
+        url: `/superAdmin/get_doctors_or_kiosks_by_regex?type=${dataSearch}s&key1=${selectedLocation}&key2=${inputValue}`,
         // /admin/getDoctorOrKioksDataById?type=kiosks&id=6645c182821e914245ccf085.
         method: "GET",
       }),
+      providesTags:["SuperAdmin"],
     }),
     koiskloctionlist: builder.query({
       query: () => ({
-        url: `/admin/getKiosksCities`,
+        url: `/superAdmin/getKiosksCities`,
         method: "GET",
       }),
+      providesTags:["SuperAdmin"],
     }),
     // doctor and kiosk active inactive?
     activeStatus: builder.mutation({
       query: ({ userStatus, statusData }) => ({
-        url: `admin/update_resume_suspended_status/${userStatus}`,
+        url: `superAdmin/update_resume_suspended_status/${userStatus}`,
         // /admin/getDoctorOrKioksDataById?type=kiosks&id=6645c182821e914245ccf085.
         method: "PATCH",
         body: statusData,
       }),
+      invalidatesTags:["SuperAdmin"],
     }),
     // /admin/getloggedInAdmin
     adminProfile: builder.query({
       query: () => ({
-        url: `/admin/getloggedInAdmin`,
+        url: `/superAdmin/getloggedInAdmin`,
         method: "GET",
       }),
+      providesTags:["SuperAdmin"],
     }),
     UpdateProfile: builder.mutation({
       query: ( formData ) => ({
-        url: `/admin/update_admin_profile_by_admin`,
+        url: `/superAdmin/update_admin_profile_by_admin`,
         method: "PATCH",
         body: formData,
       }),
+      invalidatesTags:["SuperAdmin"],
     }),
     overalldata:builder.query({
       query:()=>({
-        url:`/admin/getAnalytics`,
+        url:`/superAdmin/getAnalytics`,
         method:"GET",
       })
+      
     })
+    
   }),
 });
 
 export const {
+  useOrganizationkListQuery,
   useKioskListQuery,
   useDoctorkListQuery,
   useUpdateDoctorProfileMutation,
@@ -118,4 +137,4 @@ export const {
   useAdminProfileQuery,
   useUpdateProfileMutation,
   useLazyOveralldataQuery
-} = AdminApi;
+} = SuperAdmin;

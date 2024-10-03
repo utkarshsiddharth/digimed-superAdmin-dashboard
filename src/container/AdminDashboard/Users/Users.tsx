@@ -14,15 +14,17 @@ import {
 } from "react-bootstrap";
 import Doctor from "./Doctor/Doctor";
 import Koisk from "./koisk/Koisk";
+import Organization from "./Organization/Organization";
 import { useForm } from "react-hook-form";
 import {
   useAddDoctorMutation,
   useAddKoiskMutation,
+  useAddOrganizationMutation,
 } from "../../../redux/api/auth";
 import {
   useKoiskloctionlistQuery,
   useSearchItemQuery,
-} from "../../../redux/api/admin";
+} from "../../../redux/api/superAdmin";
 
 const Users = () => {
   const [activeNavItem, setActiveNavItem] = useState(0);
@@ -57,7 +59,8 @@ const Users = () => {
     setActiveNavItem(index);
   };
   const [addDoctor] = useAddDoctorMutation();
-  const [addkiosk] = useAddKoiskMutation();
+  const [addkiosk] = useAddKoiskMutation();  
+  const [addOrganization] = useAddOrganizationMutation();
   const {
     register,
     handleSubmit,
@@ -93,6 +96,7 @@ const Users = () => {
     setLoader(true);
     try {
       const response = await addDoctor(formattedData);
+      console.log(response);
       //@ts-ignore
       if (response?.error?.data?.message) {
         //@ts-ignore
@@ -100,7 +104,7 @@ const Users = () => {
         //@ts-ignore
         alert("Error: " + response?.error.data.message);
         setLoader(false);
-        return; 
+        return;
       }
       alert("Doctor added successfully");
       setShow15(true);
@@ -117,27 +121,65 @@ const Users = () => {
     handleSubmit: handleSubmit1,
     formState: { errors: formErrors },
   } = useForm();
+
   const onSubmit1 = async (data: any) => {
     setLoader(true);
     try {
-      const response = await addkiosk(data);
+      const response: any = await addkiosk(data);
       console.log("Response from addkiosk:", response);
+      if (response?.data) {
+        alert(response?.data.message);
+      }
+      if (response?.error?.data?.message) {
+        //@ts-ignore
+        console.error("Error:", response?.error.data.message);
+        //@ts-ignore
+        alert("Error: " + response?.error.data.message);
+      }
+
       setShow15(true);
       setModalShow(false);
     } catch (err) {
+      //  alert("somthing went wrong..")
       console.error("Error:", err);
     } finally {
       setLoader(false);
     }
-    alert("Kiosk added successfully");
   };
+  // for organization 
+  const { register: register2, handleSubmit: handleSubmit2 } = useForm();
+  const onSubmit2 = async (data: any) => {
+    setLoader(true);
+    try {
+      const response: any = await addOrganization(data);
+     
+      if (response?.data) {
+        alert(response?.data.message);
+      }
+      if (response?.error?.data?.message) {
+        //@ts-ignore
+        console.error("Error:", response?.error.data.message);
+        //@ts-ignore
+        alert("Error: " + response?.error.data.message);
+      }
 
+      setShow15(true);
+      setModalShow(false);
+    } catch (err) {
+      //  alert("somthing went wrong..")
+      console.error("Error:", err);
+    } finally {
+      setLoader(false);
+    }
+  };
   return (
     <Fragment>
       {/* add koisk Modal */}
       {activeNavItem === 0 && (
         <div>
           <Modal
+            backdrop="static"
+            animation={false}
             centered
             show={modalShow}
             onHide={() => setModalShow(false)}
@@ -147,7 +189,7 @@ const Users = () => {
           >
             <form onSubmit={handleSubmit(onSubmit)}>
               <Modal.Header closeButton>
-                <Modal.Title as="h6">Add User</Modal.Title>
+                <Modal.Title as="h6">Add Doctor</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Row>
@@ -344,18 +386,6 @@ const Users = () => {
                           required: "Password is required",
                         })}
                       />
-                      <button
-                        className="btn-gray border-0 px-3 rounded-end-2"
-                        onClick={() => setShowpass(!showpass)}
-                        type="button"
-                      >
-                        <i
-                          className={`${
-                            showpass ? "ri-eye-line" : "ri-eye-off-line"
-                          } align-middle`}
-                          aria-hidden="true"
-                        ></i>
-                      </button>
                     </InputGroup>
                     {errors.password && (
                       <p className="text-danger">Password is Required</p>
@@ -373,7 +403,9 @@ const Users = () => {
                       })}
                     />
                     {errors.site && (
-                      <p className="text-danger">qualification Name is Required</p>
+                      <p className="text-danger">
+                        qualification Name is Required
+                      </p>
                     )}
                   </Col>
                   <Col xl={6} className="mt-2">
@@ -388,7 +420,9 @@ const Users = () => {
                       })}
                     />
                     {errors.site && (
-                      <p className="text-danger">specialization Name is Required</p>
+                      <p className="text-danger">
+                        specialization Name is Required
+                      </p>
                     )}
                   </Col>
                 </Row>
@@ -463,7 +497,6 @@ const Users = () => {
                       <p className="text-danger">End date is Required</p>
                     )}
                   </Col>
-                  
                 </div>
               </Modal.Body>
               <Modal.Footer>
@@ -498,6 +531,8 @@ const Users = () => {
       {activeNavItem === 1 && (
         <div>
           <Modal
+            backdrop={"static"}
+            animation={false}
             centered
             show={modalShow}
             onHide={() => setModalShow(false)}
@@ -639,17 +674,103 @@ const Users = () => {
                         aria-label="Last name"
                         {...register1("password", { required: true })}
                       />
+                    </InputGroup>
+                  </Col>
+                </Row>
+              </Modal.Body>
+
+              <Modal.Footer>
+                <Col md={12} className="d-flex justify-content-end mt-3">
+                  <button
+                    className=" border-0 bg-bluee rounded-2 py-2 px-4 fw-semibold fs-6 text-fixed-white"
+                    disabled={loader}
+                  >
+                    {loader ? (
                       <button
-                        className="btn-gray border-0 px-3 rounded-end-2"
-                        onClick={() => setShowpass(!showpass)}
+                        className="border-0 blue-bg rounded-2 ms-2 px-4 fw-semibold fs-6 text-fixed-white"
+                        type="button"
+                        disabled
                       >
-                      <i
-                          className={`${
-                            showpass ? "ri-eye-line" : "ri-eye-off-line"
-                          } align-middle`}
+                        <span
+                          className="spinner-border spinner-border-sm mx-2"
+                          role="status"
                           aria-hidden="true"
-                        ></i>
+                        ></span>
+                        Submit...
                       </button>
+                    ) : (
+                      <span className="fs-15 fw-semibold">Submit</span>
+                    )}
+                  </button>
+                </Col>
+              </Modal.Footer>
+            </form>
+          </Modal>
+        </div>
+      )}
+
+      {activeNavItem === 2 && (
+        <div>
+          <Modal
+            backdrop={"static"}
+            animation={false}
+            centered
+            show={modalShow}
+            onHide={() => setModalShow(false)}
+            keyboard={false}
+            className="modal fade"
+            size="xl"
+          >
+            <form onSubmit={handleSubmit2(onSubmit2)}>
+              <Modal.Header closeButton>
+                <Modal.Title as="h6">Add Organization</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Row>
+                  <Col md={6} className="">
+                    <Form.Label className="">Organization Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter your Organization Name"
+                      aria-label="First name"
+                      {...register2("name", { required: true })}
+                    />
+                  </Col>
+                  <Col xl={6} className="mt-2">
+                    <Form.Label className="">Organization Email ID</Form.Label>
+                    <Form.Control
+                      type="email"
+                      className=""
+                      placeholder="Enter your Organization Email ID"
+                      aria-label="email"
+                      {...register2("email", { required: true })}
+                    />
+                  </Col>
+
+                  <Col md={6} className="mt-2">
+                    <Form.Label className="">Address</Form.Label>
+                    <Form.Control
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter your Address"
+                      aria-label="Last name"
+                      {...register2("address", { required: true })}
+                    />
+                  </Col>
+
+                  <Col md={6}>
+                    <Form.Label className="mt-2">
+                      Organization Password
+                    </Form.Label>
+                    <InputGroup className="">
+                      <Form.Control
+                        type={showpass ? "text" : "password"}
+                        className="form-control"
+                        placeholder="Enter your Password"
+                        aria-label="Last name"
+                        {...register2("password", { required: true })}
+                      />
                     </InputGroup>
                   </Col>
                 </Row>
@@ -738,7 +859,7 @@ const Users = () => {
                   className="fs-6 fw-semibold rounded-2 border-0 px-3 py-2 bg-bluee text-fixed-white"
                   onClick={() => setModalShow(true)}
                 >
-                  + Add User
+                  + Add
                 </button>
               </div>
             </div>
@@ -751,7 +872,7 @@ const Users = () => {
           <Nav
             className="nav nav-tabs mb-3 nav-justified nav-style-1 d-sm-flex d-block"
             role="tablist"
-            defaultActiveKey="third"
+            defaultActiveKey="first"
           >
             <Nav.Item className="">
               <Nav.Link
@@ -777,18 +898,18 @@ const Users = () => {
                 Kiosk
               </Nav.Link>
             </Nav.Item>
-
-            {/* <Nav.Item>
-              <Form.Select
-                aria-label="Default select example"
-                className=" py-2 ps-15"
+            <Nav.Item className="">
+              <Nav.Link
+                eventKey="third"
+                type="button"
+                className={`koisk_test_nav fs-15 ${
+                  activeNavItem === 2 ? "activeAdminUserNav" : ""
+                }`}
+                onClick={() => handleNavItemClick(2)}
               >
-                <option>Open this select menu</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-              </Form.Select>
-            </Nav.Item> */}
+                Organization
+              </Nav.Link>
+            </Nav.Item>
           </Nav>
 
           {activeNavItem === 0 && (
@@ -801,9 +922,14 @@ const Users = () => {
               <Koisk SearchData={data?.data?.result} />
             </div>
           )}
+          {activeNavItem === 2 && (
+            <div>
+              <Organization SearchData ={inputValue} />
+            </div>
+          )}
         </Card>
       </Row>
-      {activeNavItem === 0 && (
+      {/* {activeNavItem === 0 && (
         <div>
           {show15 && (
             <ToastContainer className="toast-container position-fixed top-0 end-0 p-3">
@@ -854,7 +980,7 @@ const Users = () => {
             </ToastContainer>
           )}
         </div>
-      )}
+      )} */}
     </Fragment>
   );
 };

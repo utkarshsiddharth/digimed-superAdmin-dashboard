@@ -11,7 +11,7 @@ import { useLoginUserMutation } from "../redux/api/auth";
 import login from "../assets/images/faces/login.png";
 
 export default function DoctorLogin() {
-  const [doctorLoginUser] = useLoginUserMutation();
+  const [loginUser] = useLoginUserMutation();
 
   const [loader, setLoader] = useState(false);
   // const [adminLogin] = useAdminLoginMutation();
@@ -26,13 +26,13 @@ export default function DoctorLogin() {
     setLoader(true);
 
     try {
-      const response: any = await doctorLoginUser(data);
+      const response: any = await loginUser(data);
       console.log(response?.error?.data?.message);
       console.log(response);
       if (response?.data?.success) {
         setLoader(false);
 
-        navigate("admin/user");
+        navigate("superAdmin/user");
 
         const token = response?.data?.data?.token;
         if (token) {
@@ -75,8 +75,8 @@ export default function DoctorLogin() {
         <div className="row authentication ms-5">
           <Col xxl={4} xl={4} lg={4} md={12} sm={12}>
             <div className="row justify-content-center h-100">
-              <form onSubmit={handleSubmit(onSubmit)}>'
-                ;''
+              <form onSubmit={handleSubmit(onSubmit)}>
+                ' ;''
                 <div className="">
                   <div className="p-3">
                     <div className="d-flex justify-content-center">
@@ -94,7 +94,9 @@ export default function DoctorLogin() {
                       />
                     </div>
                     <div className="d-flex justify-content-center ">
-                      <h1 className="fs-5 fw-bold blue-texxt">SUPERADMIN LOGIN</h1>
+                      <h1 className="fs-5 fw-bold blue-texxt">
+                        SUPERADMIN LOGIN
+                      </h1>
                     </div>
                     <Col xl={12} className="mt-0">
                       <label
@@ -109,7 +111,7 @@ export default function DoctorLogin() {
                           className="form-control-lg"
                           id="create-password"
                           placeholder="Enter Username"
-                          {...register("email", { required: true })}
+                          {...register("email_id", { required: true })}
                         />
                       </div>
                       {errors.email_id?.type === "required" && (

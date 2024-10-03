@@ -70,6 +70,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               element={<AdminReports statesWithPatientsNo={[]} totalpatientCount={0} />}
             />
           </Route>
+
+          
         </Routes>
       </React.Suspense>
       {/* </Provider> */}

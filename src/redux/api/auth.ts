@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const UserAuthApi = createApi({
   reducerPath: "user-authentication",
-  tagTypes: ["college"],
+  tagTypes: ["SuperAdmin"],
   baseQuery: fetchBaseQuery({
     baseUrl: "https://digi-med-backend.onrender.com",
     // baseUrl: "https://shatayu.online",
@@ -21,32 +21,41 @@ export const UserAuthApi = createApi({
     // Admin login
     loginUser: builder.mutation({
       query: (data) => ({
-        url: "/admin/login_admin",
+        url: "/superAdmin/login",
         method: "post",
         body: data,
       }),
-      invalidatesTags: ["college"],
+      invalidatesTags: ["SuperAdmin"],
     }),
     addDoctor: builder.mutation({
       query: (data) => ({
-        url: "/admin/add_doctor",
+        url: "/superAdmin/add_doctor",
         method: "post",
         body: data,
       }),
-      invalidatesTags: ["college"],
+      invalidatesTags: ["SuperAdmin"],
     }),
     addKoisk: builder.mutation({
       query: (data) => ({
-        url: "/admin/add_kiosk",
+        url: "/superAdmin/add_kiosk",
         method: "post",
-        body: data,
+        body: data, 
       }),
-      invalidatesTags: ["college"],
+      invalidatesTags: ["SuperAdmin"],
+    }),
+    addOrganization: builder.mutation({
+      query: (data) => ({
+        url: "/superAdmin/addOrganization",
+        method: "post",
+        body: data, 
+      }),
+      invalidatesTags: ["SuperAdmin"],
     }),
   }),
 });
 
 export const {
+  useAddOrganizationMutation,
   useLoginUserMutation,
   useAddDoctorMutation,
   useAddKoiskMutation,

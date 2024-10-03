@@ -1,7 +1,7 @@
 /* eslint-disable linebreak-style */
 import { Fragment, useEffect, useState } from "react";
 import { Row, Col, Form, Card } from "react-bootstrap";
-import { useAdminProfileQuery, useUpdateProfileMutation } from "../../../redux/api/admin";
+import { useAdminProfileQuery, useUpdateProfileMutation } from "../../../redux/api/superAdmin";
 import { useForm } from "react-hook-form";
 import Loader from "../../../components/common/loader/loader";
 

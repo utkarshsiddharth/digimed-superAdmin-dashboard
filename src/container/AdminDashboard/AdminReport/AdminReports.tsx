@@ -1,8 +1,8 @@
 /* eslint-disable linebreak-style */
 import { FC, Fragment, useEffect, useState } from "react";
 import { Card, CardHeader, Col, Nav, Row, Tab, Table } from "react-bootstrap";
-import { useLazyOveralldataQuery } from "../../../redux/api/admin";
-
+import { useLazyOveralldataQuery } from "../../../redux/api/superAdmin";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 interface AdminReportsProps {
   statesWithPatientsNo: Array<{ _id: string; count: number }>;
   totalpatientCount: number;
@@ -10,6 +10,18 @@ interface AdminReportsProps {
 
 const AdminReports: FC<AdminReportsProps> = () => {
   const [trigger, { data, error, isLoading }] = useLazyOveralldataQuery();
+  const [openCards, setOpenCards] = useState<any>([]);
+
+  const toggleTable = (cardNumber: any) => {
+    setOpenCards((prev: any) => {
+      if (prev.includes(cardNumber)) {
+        return prev.filter((number: any) => number !== cardNumber);
+      } else {
+        return [...prev, cardNumber];
+      }
+    });
+  };
+
   const [statesWithPatientsNoData, setStatesWithPatientsNoData] =
     useState<AdminReportsProps>({
       statesWithPatientsNo: [],
@@ -70,13 +82,13 @@ const AdminReports: FC<AdminReportsProps> = () => {
                       className="flex-sm-fill text-sm-center koisk_test_nav"
                       eventKey="first"
                     >
-                      Overall
+                      Overall Data
                     </Nav.Link>
                     <Nav.Link
                       className="flex-sm-fill text-sm-center koisk_test_nav"
                       eventKey="second"
                     >
-                      Individual Kiosk
+                      Individual Data
                     </Nav.Link>
                   </Nav>
                   <Tab.Content className="tab-content">
@@ -244,7 +256,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
                           </Table>
                         </div>
                       </Card>
-                      <Card className="custom-card hrm-main-cardd mt-5">
+                      {/* <Card className="custom-card hrm-main-cardd mt-5">
                         <h1 className="fw-bold fs-6 mt-2">Number of Doctors</h1>
                         <h1 className="red-text fw-bolder fs-1">40</h1>
                         <div className="table-responsive">
@@ -287,7 +299,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
                             </tbody>
                           </Table>
                         </div>
-                      </Card>
+                      </Card> */}
                       <Card className="custom-card hrm-main-cardd mt-5">
                         <h1 className="fw-bold fs-6 mt-2">
                           Number of Test Conducted
@@ -341,18 +353,48 @@ const AdminReports: FC<AdminReportsProps> = () => {
                       role="tabpanel"
                       eventKey="second"
                     >
+                      <div style={{ marginTop: "20px" }}>
+                        <Card className="custom-card p-3 hrm-main-cardd primary bg-light">
+                          <div className="d-flex flex-row justify-content-between align-items-center w-100 ">
+                            <div className="mb-4 w-50 me-5">
+                              <b className="fs-18">Organization</b>
+                              <select
+                                aria-label="Default select example"
+                                className="py-2 w-100 mt-2"
+                                style={{
+                                  borderRadius: "5px",
+                                  padding: "10px",
+                                }}
+                              >
+                                <option className="fs-15" value="">
+                                  All
+                                </option>
+                                <option value={"shailesh"}>shailesh</option>
+                              </select>
+                            </div>
+
+                            <div className="mb-4 w-50">
+                              <b className="fs-18">Kiosks</b>
+                              <select
+                                aria-label="Default select example"
+                                className="py-2 w-100 mt-2"
+                                style={{
+                                  borderRadius: "5px",
+                                  padding: "10px",
+                                }}
+                              >
+                                <option className="fs-15" value="">
+                                  All
+                                </option>
+                                <option value={"shailesh"}>shailesh</option>
+                              </select>
+                            </div>
+                          </div>
+                        </Card>
+                      </div>
+
                       <CardHeader className="d-flex justify-content-end">
-                        <Col xl="3">
-                          {/* <Select
-                              name="colors"
-                              options={Multipleselectdata12}
-                              className="default basic-multi-select"
-                              id="choices-multiple-default"
-                              menuPlacement="auto"
-                              classNamePrefix="Select2"
-                              defaultValue={[Multipleselectdata12[0]]}
-                            /> */}
-                        </Col>
+                        <Col xl="3"></Col>
                       </CardHeader>
                       <div className="d-flex justify-content-between">
                         <Card className="custom-card p-3 hrm-main-cardd primary bg-light">
@@ -414,134 +456,184 @@ const AdminReports: FC<AdminReportsProps> = () => {
                           </Card.Body>
                         </Card>
                       </div>
-                      <Card className="custom-card hrm-main-cardd primary mt-3">
+                      <Card className="custom-card hrm-main-cardd primary">
+                        <div className="position-relative">
+                          <div
+                            className="d-flex justify-content-end justify-item-center"
+                            onClick={() => toggleTable(1)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {openCards.includes(1) ? (
+                              <FaChevronUp className="fs-2 mt-4" />
+                            ) : (
+                              <FaChevronDown className="fs-2 mt-4" />
+                            )}
+                          </div>
+                        </div>
                         <h1 className="fw-bold fs-6 mt-2">
-                          Number of Patients
+                          Number of Patients State Wise
                         </h1>
                         <h1 className="red-text fw-bolder ">241</h1>
+
                         <div className="table-responsive">
-                          <Table className="table text-nowrap">
-                            <thead>
-                              <tr>
-                                <td scope="col" className="fw-bold fs-6">
-                                  S.No
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  State
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  Number of Patients
-                                </td>
-                              </tr>
-                            </thead>
-                            <tbody className="table-group-divider">
-                              <tr>
-                                <td>1.</td>
-                                <td scope="row">Andhra Pradesh</td>
-                                <td>10</td>
-                              </tr>
-                              <tr>
-                                <td>2.</td>
-                                <td scope="row">Arunachal Pradesh</td>
-                                <td>20</td>
-                              </tr>
-                              <tr>
-                                <td>3.</td>
-                                <td scope="row">Assam</td>
-                                <td>15</td>
-                              </tr>
-                            </tbody>
-                          </Table>
+                          {openCards.includes(1) && (
+                            <>
+                              <Table className="table text-nowrap">
+                                <thead>
+                                  <tr>
+                                    <td scope="col" className="fw-bold fs-6">
+                                      S.No
+                                    </td>
+                                    <td scope="col" className="fw-bold fs-6">
+                                      State
+                                    </td>
+                                    <td scope="col" className="fw-bold fs-6">
+                                      Number of Patients
+                                    </td>
+                                  </tr>
+                                </thead>
+                                <tbody className="table-group-divider">
+                                  <tr>
+                                    <td>1.</td>
+                                    <td scope="row">Andhra Pradesh</td>
+                                    <td>10</td>
+                                  </tr>
+                                  <tr>
+                                    <td>2.</td>
+                                    <td scope="row">Arunachal Pradesh</td>
+                                    <td>20</td>
+                                  </tr>
+                                  <tr>
+                                    <td>3.</td>
+                                    <td scope="row">Assam</td>
+                                    <td>15</td>
+                                  </tr>
+                                </tbody>
+                              </Table>
+                            </>
+                          )}
                         </div>
                       </Card>
                       <Card className="custom-card hrm-main-cardd primary mt-5">
+                        <div className="position-relative">
+                          <div
+                            className="d-flex justify-content-end justify-item-center"
+                            onClick={() => toggleTable(2)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {openCards.includes(2) ? (
+                              <FaChevronUp className="fs-2 mt-4" />
+                            ) : (
+                              <FaChevronDown className="fs-2 mt-4" />
+                            )}
+                          </div>
+                        </div>
                         <h1 className="fw-bold fs-6 mt-2">
-                          Number of Patients
+                          Number of Patients Kiosks Wise
                         </h1>
                         <h1 className="red-text fw-bolder fs-1 ">241</h1>
                         <div className="table-responsive">
-                          <Table className="table text-nowrap">
-                            <thead>
-                              <tr>
-                                <td scope="col" className="fw-bold fs-6">
-                                  S.No
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  Kiosk
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  State
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  Number of Patients
-                                </td>
-                              </tr>
-                            </thead>
-                            <tbody className="table-group-divider">
-                              <tr>
-                                <td>1.</td>
-                                <td scope="row">Kiosk 1</td>
-                                <td scope="row">Arunachal Pradesh</td>
-                                <td>10</td>
-                              </tr>
-                              <tr>
-                                <td>2.</td>
-                                <td scope="row">Kiosk 2</td>
-                                <td scope="row">Arunachal Pradesh</td>
-                                <td>20</td>
-                              </tr>
-                              <tr>
-                                <td>3.</td>
-                                <td scope="row">Kiosk 3</td>
-                                <td scope="row">Assam</td>
-                                <td>2</td>
-                              </tr>
-                            </tbody>
-                          </Table>
+                          {openCards.includes(2) && (
+                            <>
+                              <Table className="table text-nowrap">
+                                <thead>
+                                  <tr>
+                                    <td scope="col" className="fw-bold fs-6">
+                                      S.No
+                                    </td>
+                                    <td scope="col" className="fw-bold fs-6">
+                                      Kiosk
+                                    </td>
+                                    <td scope="col" className="fw-bold fs-6">
+                                      State
+                                    </td>
+                                    <td scope="col" className="fw-bold fs-6">
+                                      Number of Patients
+                                    </td>
+                                  </tr>
+                                </thead>
+                                <tbody className="table-group-divider">
+                                  <tr>
+                                    <td>1.</td>
+                                    <td scope="row">Kiosk 1</td>
+                                    <td scope="row">Arunachal Pradesh</td>
+                                    <td>10</td>
+                                  </tr>
+                                  <tr>
+                                    <td>2.</td>
+                                    <td scope="row">Kiosk 2</td>
+                                    <td scope="row">Arunachal Pradesh</td>
+                                    <td>20</td>
+                                  </tr>
+                                  <tr>
+                                    <td>3.</td>
+                                    <td scope="row">Kiosk 3</td>
+                                    <td scope="row">Assam</td>
+                                    <td>2</td>
+                                  </tr>
+                                </tbody>
+                              </Table>
+                            </>
+                          )}
                         </div>
                       </Card>
                       <Card className="custom-card hrm-main-cardd primary mt-5">
+                        <div className="position-relative">
+                          <div
+                            className="d-flex justify-content-end justify-item-center"
+                            onClick={() => toggleTable(3)} // Pass card number
+                            style={{ cursor: "pointer" }}
+                          >
+                            {openCards.includes(3) ? ( // Check if the third card is open
+                              <FaChevronUp className="fs-2 mt-4" />
+                            ) : (
+                              <FaChevronDown className="fs-2 mt-4" />
+                            )}
+                          </div>
+                        </div>
                         <h1 className="fw-bold fs-6 mt-2">Number of Doctors</h1>
                         <h1 className="red-text fw-bolder fs-1">40</h1>
                         <div className="table-responsive">
-                          <Table className="table text-nowrap">
-                            <thead>
-                              <tr>
-                                <td scope="col" className="fw-bold fs-6">
-                                  S.No
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  List of Doctors
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  State
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  Time Spend
-                                </td>
-                              </tr>
-                            </thead>
-                            <tbody className="table-group-divider">
-                              <tr>
-                                <td>1.</td>
-                                <td scope="row">Dr.Rakshita</td>
-                                <td>Chandigarh</td>
-                                <td>01:20:02</td>
-                              </tr>
-                              <tr>
-                                <td>2.</td>
-                                <td scope="row">Dr.Ameer</td>
-                                <td>Punjab</td>
-                                <td>02:09:01</td>
-                              </tr>
-                              <tr>
-                                <td>3.</td>
-                                <td scope="row">Dr.Riya</td>
-                                <td>Haryana</td>
-                                <td>02:09:01</td>
-                              </tr>
-                            </tbody>
-                          </Table>
+                          {openCards.includes(3) && ( // Check if the third card is open
+                            <Table className="table text-nowrap">
+                              <thead>
+                                <tr>
+                                  <td scope="col" className="fw-bold fs-6">
+                                    S.No
+                                  </td>
+                                  <td scope="col" className="fw-bold fs-6">
+                                    List of Doctors
+                                  </td>
+                                  <td scope="col" className="fw-bold fs-6">
+                                    State
+                                  </td>
+                                  <td scope="col" className="fw-bold fs-6">
+                                    Time Spent
+                                  </td>
+                                </tr>
+                              </thead>
+                              <tbody className="table-group-divider">
+                                <tr>
+                                  <td>1.</td>
+                                  <td scope="row">Dr. Rakshita</td>
+                                  <td>Chandigarh</td>
+                                  <td>01:20:02</td>
+                                </tr>
+                                <tr>
+                                  <td>2.</td>
+                                  <td scope="row">Dr. Ameer</td>
+                                  <td>Punjab</td>
+                                  <td>02:09:01</td>
+                                </tr>
+                                <tr>
+                                  <td>3.</td>
+                                  <td scope="row">Dr. Riya</td>
+                                  <td>Haryana</td>
+                                  <td>02:09:01</td>
+                                </tr>
+                              </tbody>
+                            </Table>
+                          )}
                         </div>
                       </Card>
                     </Tab.Pane>
