@@ -31,6 +31,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
     const fetchData = async () => {
       // @ts-ignore
       const response = await trigger();
+
       if (response.data && response.data.success) {
         const { statesWisePatients, totalpatientCount } = response.data.data;
         setStatesWithPatientsNoData({
@@ -51,10 +52,13 @@ const AdminReports: FC<AdminReportsProps> = () => {
     totalPatients = 0,
     stateWithMostUser = { state: "Unknown", count: 0 },
     totalKiosksActiveHours = 0,
+    totalHoursConsultationProvided = 0,
     kioksWisePatients = [],
     kioskWiseConductedTests = [],
   } = data?.data || {};
   const totalKiosksActiveHoursInHours = totalKiosksActiveHours / (3600 * 1000);
+  const totalHoursConsultationProvidedInHours =
+    totalHoursConsultationProvided / (3600 * 1000);
   return (
     <Fragment>
       <Row>
@@ -139,7 +143,10 @@ const AdminReports: FC<AdminReportsProps> = () => {
                             </div>
                             <div className="d-flex justify-content-center">
                               <span className="fw-semibold fs-1 red-text mt-1">
-                                120 Hours
+                                {totalHoursConsultationProvidedInHours?.toFixed(
+                                  2
+                                )}{" "}
+                                Hours
                               </span>
                             </div>
                           </Card.Body>
@@ -161,100 +168,130 @@ const AdminReports: FC<AdminReportsProps> = () => {
                         </Card>
                       </div>
                       <Card className="custom-card hrm-main-cardd mt-3">
+                        <div className="position-relative">
+                          <div
+                            className="d-flex justify-content-end justify-item-center"
+                            onClick={() => toggleTable(4)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {openCards.includes(4) ? (
+                              <FaChevronUp className="fs-2 mt-4" />
+                            ) : (
+                              <FaChevronDown className="fs-2 mt-4" />
+                            )}
+                          </div>
+                        </div>
                         <h1 className="fw-bold fs-6 mt-2">
                           Number of Patients{" "}
                         </h1>
                         <h1 className="red-text fw-bolder fs-1">
                           {totalPatients}
                         </h1>
-                        <div className="table-responsive">
-                          <Table className="table text-nowrap">
-                            <thead>
-                              <tr>
-                                <td scope="col" className="fw-bold fs-6">
-                                  S.No
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  State
-                                </td>
-                                {/* <td scope="col" className="fw-bold fs-6">Seller</td> */}
-                                <td scope="col" className="fw-bold fs-6">
-                                  Number of Patients
-                                </td>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {statesWithPatientsNoData?.statesWithPatientsNo
-                                .length > 0 ? (
-                                statesWithPatientsNoData?.statesWithPatientsNo.map(
-                                  (state, index) => (
-                                    <tr key={index}>
-                                      <td scope="row">{index + 1}</td>
-                                      <td scope="row">{state?._id}</td>
-                                      <td scope="row">{state?.count}</td>
-                                    </tr>
-                                  )
-                                )
-                              ) : (
+                        {openCards.includes(4) && (
+                          <div className="table-responsive">
+                            <Table className="table text-nowrap">
+                              <thead>
                                 <tr>
-                                  <td colSpan={3} className="text-center">
-                                    No Data Available !!
+                                  <td scope="col" className="fw-bold fs-6">
+                                    S.No
+                                  </td>
+                                  <td scope="col" className="fw-bold fs-6">
+                                    State
+                                  </td>
+                                  {/* <td scope="col" className="fw-bold fs-6">Seller</td> */}
+                                  <td scope="col" className="fw-bold fs-6">
+                                    Number of Patients
                                   </td>
                                 </tr>
-                              )}
-                            </tbody>
-                          </Table>
-                        </div>
+                              </thead>
+                              <tbody>
+                                {statesWithPatientsNoData?.statesWithPatientsNo
+                                  .length > 0 ? (
+                                  statesWithPatientsNoData?.statesWithPatientsNo.map(
+                                    (state, index) => (
+                                      <tr key={index}>
+                                        <td scope="row">{index + 1}</td>
+                                        <td scope="row">{state?._id}</td>
+                                        <td scope="row">{state?.count}</td>
+                                      </tr>
+                                    )
+                                  )
+                                ) : (
+                                  <tr>
+                                    <td colSpan={3} className="text-center">
+                                      No Data Available !!
+                                    </td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </Table>
+                          </div>
+                        )}
                       </Card>
                       <Card className="custom-card hrm-main-cardd mt-5">
+                        <div className="position-relative">
+                          <div
+                            className="d-flex justify-content-end justify-item-center"
+                            onClick={() => toggleTable(5)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {openCards.includes(5) ? (
+                              <FaChevronUp className="fs-2 mt-4" />
+                            ) : (
+                              <FaChevronDown className="fs-2 mt-4" />
+                            )}
+                          </div>
+                        </div>
                         <h1 className="fw-bold fs-6 mt-2">Number of Kiosk</h1>
                         <h1 className="red-text fw-bolder fs-1">
                           {kioksWisePatients?.length}
                         </h1>
-                        <div className="table-responsive">
-                          <Table className="table text-nowrap">
-                            <thead>
-                              <tr>
-                                <td scope="col" className="fw-bold fs-6">
-                                  S.No
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  Kiosk
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  State
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  Number of Patients
-                                </td>
-                              </tr>
-                            </thead>
-                            <tbody className="table-group-divider">
-                              {kioksWisePatients?.length > 0 ? (
-                                kioksWisePatients?.map(
-                                  (kiosk: any, index: number) => (
-                                    <tr key={index}>
-                                      <td>{index + 1}.</td>
-                                      <td scope="row">
-                                        {kiosk.kioskData.name_of_center}
-                                      </td>
-                                      <td scope="row">
-                                        {kiosk.kioskData.state}
-                                      </td>
-                                      <td>{kiosk.patientCount}</td>
-                                    </tr>
-                                  )
-                                )
-                              ) : (
+                        {openCards.includes(5) && (
+                          <div className="table-responsive">
+                            <Table className="table text-nowrap">
+                              <thead>
                                 <tr>
-                                  <td colSpan={4} className="text-center">
-                                    No Data Available !!
+                                  <td scope="col" className="fw-bold fs-6">
+                                    S.No
+                                  </td>
+                                  <td scope="col" className="fw-bold fs-6">
+                                    Kiosk
+                                  </td>
+                                  <td scope="col" className="fw-bold fs-6">
+                                    State
+                                  </td>
+                                  <td scope="col" className="fw-bold fs-6">
+                                    Number of Patients
                                   </td>
                                 </tr>
-                              )}
-                            </tbody>
-                          </Table>
-                        </div>
+                              </thead>
+                              <tbody className="table-group-divider">
+                                {kioksWisePatients?.length > 0 ? (
+                                  kioksWisePatients?.map(
+                                    (kiosk: any, index: number) => (
+                                      <tr key={index}>
+                                        <td>{index + 1}.</td>
+                                        <td scope="row">
+                                          {kiosk.kioskData.name_of_center}
+                                        </td>
+                                        <td scope="row">
+                                          {kiosk.kioskData.state}
+                                        </td>
+                                        <td>{kiosk.patientCount}</td>
+                                      </tr>
+                                    )
+                                  )
+                                ) : (
+                                  <tr>
+                                    <td colSpan={4} className="text-center">
+                                      No Data Available !!
+                                    </td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </Table>
+                          </div>
+                        )}
                       </Card>
                       {/* <Card className="custom-card hrm-main-cardd mt-5">
                         <h1 className="fw-bold fs-6 mt-2">Number of Doctors</h1>
@@ -301,50 +338,65 @@ const AdminReports: FC<AdminReportsProps> = () => {
                         </div>
                       </Card> */}
                       <Card className="custom-card hrm-main-cardd mt-5">
+                        <div className="position-relative">
+                          <div
+                            className="d-flex justify-content-end justify-item-center"
+                            onClick={() => toggleTable(6)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {openCards.includes(6) ? (
+                              <FaChevronUp className="fs-2 mt-4" />
+                            ) : (
+                              <FaChevronDown className="fs-2 mt-4" />
+                            )}
+                          </div>
+                        </div>
                         <h1 className="fw-bold fs-6 mt-2">
                           Number of Test Conducted
                         </h1>
                         <h1 className="red-text fw-bolder fs-1">
                           {kioskWiseConductedTests?.length}
                         </h1>
-                        <div className="table-responsive">
-                          <Table className="table text-nowrap">
-                            <thead>
-                              <tr>
-                                <td scope="col" className="fw-bold fs-6">
-                                  S.No
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  List of Kiosk
-                                </td>
-                                <td scope="col" className="fw-bold fs-6">
-                                  Number of Test
-                                </td>
-                              </tr>
-                            </thead>
-                            <tbody className="table-group-divider">
-                              {kioskWiseConductedTests.length > 0 ? (
-                                kioskWiseConductedTests.map(
-                                  (kiosk: any, index: any) => (
-                                    <tr key={index}>
-                                      <td>{index + 1}.</td>
-                                      <td scope="row">
-                                        {kiosk?.kioskData?.name_of_center}
-                                      </td>
-                                      <td>{kiosk?.completedTestsCount}</td>
-                                    </tr>
-                                  )
-                                )
-                              ) : (
+                        {openCards.includes(6) && (
+                          <div className="table-responsive">
+                            <Table className="table text-nowrap">
+                              <thead>
                                 <tr>
-                                  <td colSpan={4} className="text-center">
-                                    No Data Available !!
+                                  <td scope="col" className="fw-bold fs-6">
+                                    S.No
+                                  </td>
+                                  <td scope="col" className="fw-bold fs-6">
+                                    List of Kiosk
+                                  </td>
+                                  <td scope="col" className="fw-bold fs-6">
+                                    Number of Test
                                   </td>
                                 </tr>
-                              )}
-                            </tbody>
-                          </Table>
-                        </div>
+                              </thead>
+                              <tbody className="table-group-divider">
+                                {kioskWiseConductedTests.length > 0 ? (
+                                  kioskWiseConductedTests.map(
+                                    (kiosk: any, index: any) => (
+                                      <tr key={index}>
+                                        <td>{index + 1}.</td>
+                                        <td scope="row">
+                                          {kiosk?.kioskData?.name_of_center}
+                                        </td>
+                                        <td>{kiosk?.completedTestsCount}</td>
+                                      </tr>
+                                    )
+                                  )
+                                ) : (
+                                  <tr>
+                                    <td colSpan={4} className="text-center">
+                                      No Data Available !!
+                                    </td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </Table>
+                          </div>
+                        )}
                       </Card>
                     </Tab.Pane>
                     <Tab.Pane
@@ -355,7 +407,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
                     >
                       <div style={{ marginTop: "20px" }}>
                         <Card className="custom-card p-3 hrm-main-cardd primary bg-light">
-                          <div className="d-flex flex-row justify-content-between align-items-center w-100 ">
+                          <div className="d-flex flex-row justify-content-between align-items-center w-100">
                             <div className="mb-4 w-50 me-5">
                               <b className="fs-18">Organization</b>
                               <select
