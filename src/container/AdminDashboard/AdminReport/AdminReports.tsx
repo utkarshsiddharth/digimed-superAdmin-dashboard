@@ -31,7 +31,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
     const fetchData = async () => {
       // @ts-ignore
       const response = await trigger();
-
+console.log("response",response)
       if (response.data && response.data.success) {
         const { statesWisePatients, totalpatientCount } = response.data.data;
         setStatesWithPatientsNoData({
@@ -56,9 +56,21 @@ const AdminReports: FC<AdminReportsProps> = () => {
     kioksWisePatients = [],
     kioskWiseConductedTests = [],
   } = data?.data || {};
-  const totalKiosksActiveHoursInHours = totalKiosksActiveHours / (3600 * 1000);
-  const totalHoursConsultationProvidedInHours =
-    totalHoursConsultationProvided / (3600 * 1000);
+  const totalKiosksActiveHoursInHours = Math.floor(
+    totalKiosksActiveHours / (3600 * 1000)
+  );
+  const totalMinutes = Math.floor(
+    (totalKiosksActiveHours % (3600 * 1000)) / (60 * 1000)
+  );
+  const totalHoursConsultationProvidedInHours = Math.floor(
+    totalHoursConsultationProvided / (3600 * 1000)
+  );
+  const totalMinutes1 = Math.floor(
+    (totalHoursConsultationProvided % (3600 * 1000)) / (60 * 1000)
+  );
+
+
+
   return (
     <Fragment>
       <Row>
@@ -143,10 +155,8 @@ const AdminReports: FC<AdminReportsProps> = () => {
                             </div>
                             <div className="d-flex justify-content-center">
                               <span className="fw-semibold fs-1 red-text mt-1">
-                                {totalHoursConsultationProvidedInHours?.toFixed(
-                                  2
-                                )}{" "}
-                                Hours
+                                {totalHoursConsultationProvidedInHours} Hours{" "}
+                                {totalMinutes1} Minutes
                               </span>
                             </div>
                           </Card.Body>
@@ -160,8 +170,8 @@ const AdminReports: FC<AdminReportsProps> = () => {
                             </div>
                             <div className="d-flex justify-content-center">
                               <span className="fw-semibold fs-1 red-text mt-1">
-                                {totalKiosksActiveHoursInHours?.toFixed(2)}{" "}
-                                Hours
+                                {totalKiosksActiveHoursInHours} Hours{" "}
+                                {totalMinutes} Minutes
                               </span>
                             </div>
                           </Card.Body>
