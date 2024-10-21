@@ -26,7 +26,7 @@ const Doctor = ({ SearchData }: any) => {
   const [loader, setLoader] = useState(false);
   const [modalShow, setModalShow] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
-  const [showpass, setShowpass] = useState(false);
+  const [showpass] = useState(false);
   const [suspendedId,setSuspendedId] = useState<any>("")
   const [doctorActive] = useActiveStatusMutation();
   const [updateDoctorProfile] = useUpdateDoctorProfileMutation();
@@ -159,17 +159,17 @@ const Doctor = ({ SearchData }: any) => {
 
 
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [iconState, setIconState] = useState({ user_type: "", status: "" });
-  const [, setStorActive] = useState({ user_type: "", status: "" });
-  const [active, setActive] = useState();
-  const handleActive = (event: any) => {
-    const value = event.currentTarget.getAttribute("values");
-    const newIconState = { user_type: "doctor", status: value };
-    setIconState(newIconState);
-    setIsPlaying(!isPlaying);
-    setStorActive(newIconState);
-  };
+  // const [isPlaying, setIsPlaying] = useState(false);
+  const [iconState] = useState({ user_type: "", status: "" });
+  // const [, setStorActive] = useState({ user_type: "", status: "" });
+  const [active] = useState();
+  // const handleActive = (event: any) => {
+  //   const value = event.currentTarget.getAttribute("values");
+  //   const newIconState = { user_type: "doctor", status: value };
+  //   setIconState(newIconState);
+  //   setIsPlaying(!isPlaying);
+  //   setStorActive(newIconState);
+  // };
   useEffect(() => {
     const fetchData = async () => {
       console.log("Icon State Updated:", iconState);

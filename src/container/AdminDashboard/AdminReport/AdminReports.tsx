@@ -31,7 +31,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
     const fetchData = async () => {
       // @ts-ignore
       const response = await trigger();
-console.log("response",response)
+
       if (response.data && response.data.success) {
         const { statesWisePatients, totalpatientCount } = response.data.data;
         setStatesWithPatientsNoData({
@@ -69,8 +69,6 @@ console.log("response",response)
     (totalHoursConsultationProvided % (3600 * 1000)) / (60 * 1000)
   );
 
-
-
   return (
     <Fragment>
       <Row>
@@ -83,7 +81,7 @@ console.log("response",response)
           </Card>
           <Col xl={12}>
             <Card className="custom-card">
-              {/* <Card.Header>
+              {/* <Card.Header>                           
                 <Card.Title>Data</Card.Title>
               </Card.Header> */}
               <Card.Body>
@@ -91,6 +89,7 @@ console.log("response",response)
                   <Nav
                     variant="pills"
                     className="nav nav-pills flex-column flex-sm-row mb-3"
+
                     role="tablist"
                     defaultActiveKey="first"
                   >
@@ -105,6 +104,7 @@ console.log("response",response)
                       eventKey="second"
                     >
                       Individual Data
+                      
                     </Nav.Link>
                   </Nav>
                   <Tab.Content className="tab-content">

@@ -24,7 +24,7 @@ import { useForm } from "react-hook-form";
 
 const Koisk = ({ SearchData }: any) => {
   const [selectedId, setSelectedId] = useState(null);
-  const [showpass, setShowpass] = useState(false);
+  const [showpass] = useState(false);
   const [loader, setLoader] = useState(false);
   const [modalShow, setModalShow] = useState(false);
   const [kiosksList, setKioskList] = useState([]);

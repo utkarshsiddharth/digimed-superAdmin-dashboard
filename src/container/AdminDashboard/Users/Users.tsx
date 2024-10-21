@@ -8,8 +8,7 @@ import {
   Button,
   Nav,
   Modal,
-  Toast,
-  ToastContainer,
+
   InputGroup,
 } from "react-bootstrap";
 import Doctor from "./Doctor/Doctor";
@@ -37,7 +36,7 @@ const Users = () => {
   };
   const dataSearch =
     activeNavItem === 0 ? "doctor" : activeNavItem === 1 ? "kiosk" : undefined;
-  const [showpass, setShowpass] = useState(false);
+  const [showpass] = useState(false);
   const [, setSreachModal] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const { data } = useSearchItemQuery({
@@ -53,7 +52,7 @@ const Users = () => {
     setInputValue(e.target.value);
     setSreachModal(true);
   };
-  const [show15, setShow15] = useState(false);
+  const [, setShow15] = useState(false);
   const [loader, setLoader] = useState(false);
   const handleNavItemClick = async (index: any) => {
     setActiveNavItem(index);
