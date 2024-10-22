@@ -128,6 +128,7 @@ export const SuperAdmin = createApi({
       }),
       providesTags:["SuperAdmin"],
     }),
+    // dddddd
 
     addAdmin: builder.mutation({
       query: ( formData ) => ({
