@@ -1,0 +1,10 @@
+{
+    "apps": [
+        {
+            "name": "superAdmin-dashboaed",
+            "script": "npx",
+            "interpreter": "none",
+            "args": "serve -s dist -p 8082"
+        }
+    ]
+  }  
