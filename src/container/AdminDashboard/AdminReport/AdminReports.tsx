@@ -51,17 +51,17 @@ const AdminReports: FC<AdminReportsProps> = () => {
   const {
     totalPatients = 0,
     stateWithMostUser = { state: "Unknown", count: 0 },
-    totalKiosksActiveHours = 0,
+    // totalKiosksActiveHours = 0,
     totalHoursConsultationProvided = 0,
     kioksWisePatients = [],
     kioskWiseConductedTests = [],
   } = data?.data || {};
-  const totalKiosksActiveHoursInHours = Math.floor(
-    totalKiosksActiveHours / (3600 * 1000)
-  );
-  const totalMinutes = Math.floor(
-    (totalKiosksActiveHours % (3600 * 1000)) / (60 * 1000)
-  );
+  // const totalKiosksActiveHoursInHours = Math.floor(
+  //   totalKiosksActiveHours / (3600 * 1000)
+  // );
+  // const totalMinutes = Math.floor(
+  //   (totalKiosksActiveHours % (3600 * 1000)) / (60 * 1000)
+  // );
   const totalHoursConsultationProvidedInHours = Math.floor(
     totalHoursConsultationProvided / (3600 * 1000)
   );
@@ -161,7 +161,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
                             </div>
                           </Card.Body>
                         </Card>
-                        <Card className="custom-card p-3 hrm-main-cardd danger ms-4 bg-light ">
+                        {/* <Card className="custom-card p-3 hrm-main-cardd danger ms-4 bg-light ">
                           <Card.Body>
                             <div className="d-flex justify-content-center">
                               <span className="fw-semibold fs-6">
@@ -175,7 +175,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
                               </span>
                             </div>
                           </Card.Body>
-                        </Card>
+                        </Card> */}
                       </div>
                       <Card className="custom-card hrm-main-cardd mt-3">
                         <div className="position-relative">

@@ -119,12 +119,38 @@ export const SuperAdmin = createApi({
         method:"GET",
       })
       
-    })
-    
+    }),
+   
+    allAdmin:builder.query({
+      query:(id)=>({
+        url:`/superAdmin/getAdminsList/${id}`,
+        method:"GET",
+      }),
+      providesTags:["SuperAdmin"],
+    }),
+
+    addAdmin: builder.mutation({
+      query: ( formData ) => ({
+        url: `/superAdmin/add_admin`,
+        method: "post",
+        body: formData,
+      }),
+      invalidatesTags:["SuperAdmin"],
+    }),
+    updateAdmin: builder.mutation({
+      query: ({id, formData} ) => ({
+        url: `/superAdmin/editAdmin${id}`,
+        method: "post",
+        body: formData,
+      }),
+      invalidatesTags:["SuperAdmin"],
+    }),
   }),
 });
 
 export const {
+  useUpdateAdminMutation,
+  useAddAdminMutation,
   useOrganizationkListQuery,
   useKioskListQuery,
   useDoctorkListQuery,
@@ -136,5 +162,6 @@ export const {
   useActiveStatusMutation,
   useAdminProfileQuery,
   useUpdateProfileMutation,
-  useLazyOveralldataQuery
+  useLazyOveralldataQuery,
+  useAllAdminQuery
 } = SuperAdmin;
