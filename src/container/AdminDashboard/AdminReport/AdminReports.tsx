@@ -1,7 +1,10 @@
 /* eslint-disable linebreak-style */
 import { FC, Fragment, useEffect, useState } from "react";
 import { Card, CardHeader, Col, Nav, Row, Tab, Table } from "react-bootstrap";
-import { useLazyOveralldataQuery } from "../../../redux/api/superAdmin";
+import {
+  useLazyOveralldataQuery,
+  useSelectorganisationQuery,
+} from "../../../redux/api/superAdmin";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 interface AdminReportsProps {
   statesWithPatientsNo: Array<{ _id: string; count: number }>;
@@ -29,9 +32,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
     });
   useEffect(() => {
     const fetchData = async () => {
-      // @ts-ignore
       const response = await trigger();
-
       if (response.data && response.data.success) {
         const { statesWisePatients, totalpatientCount } = response.data.data;
         setStatesWithPatientsNoData({
@@ -68,7 +69,33 @@ const AdminReports: FC<AdminReportsProps> = () => {
   const totalMinutes1 = Math.floor(
     (totalHoursConsultationProvided % (3600 * 1000)) / (60 * 1000)
   );
-
+  // individual kiosk
+  const [selectedOrganization, setSelectedOrganization] = useState("");
+  const [selectedKiosk, setSelectedKiosk] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
+  const { data: organizationsData, isLoading: orgsLoading } =
+    useSelectorganisationQuery("organizations");
+  const { data: kiosksData, isLoading: kiosksLoading } =
+    useSelectorganisationQuery("kiosks");
+  useEffect(() => {
+    if (!orgsLoading && !kiosksLoading) {
+      if (!organizationsData?.success || !kiosksData?.success) {
+        setFetchError(true);
+        setLoading(false);
+      } else {
+        setLoading(false);
+        setFetchError(false);
+      }
+    }
+  }, [orgsLoading, kiosksLoading, organizationsData, kiosksData]);
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+  if (fetchError) {
+    return <p>Error fetching data. Please try again later.</p>;
+  }
+ 
   return (
     <Fragment>
       <Row>
@@ -89,7 +116,6 @@ const AdminReports: FC<AdminReportsProps> = () => {
                   <Nav
                     variant="pills"
                     className="nav nav-pills flex-column flex-sm-row mb-3"
-
                     role="tablist"
                     defaultActiveKey="first"
                   >
@@ -104,7 +130,6 @@ const AdminReports: FC<AdminReportsProps> = () => {
                       eventKey="second"
                     >
                       Individual Data
-                      
                     </Nav.Link>
                   </Nav>
                   <Tab.Content className="tab-content">
@@ -427,11 +452,19 @@ const AdminReports: FC<AdminReportsProps> = () => {
                                   borderRadius: "5px",
                                   padding: "10px",
                                 }}
+                                value={selectedOrganization}
+                                onChange={(e) =>
+                                  setSelectedOrganization(e.target.value)
+                                }
                               >
                                 <option className="fs-15" value="">
                                   All
                                 </option>
-                                <option value={"shailesh"}>shailesh</option>
+                                {organizationsData?.data?.map((org: any) => (
+                                  <option key={org?._id} value={org?._id}>
+                                    {org?.name}
+                                  </option>
+                                ))}
                               </select>
                             </div>
 
@@ -444,11 +477,19 @@ const AdminReports: FC<AdminReportsProps> = () => {
                                   borderRadius: "5px",
                                   padding: "10px",
                                 }}
+                                value={selectedKiosk}
+                                onChange={(e) =>
+                                  setSelectedKiosk(e.target.value)
+                                }
                               >
                                 <option className="fs-15" value="">
                                   All
                                 </option>
-                                <option value={"shailesh"}>shailesh</option>
+                                {kiosksData?.data?.map((kiosk:any) => (
+                                  <option key={kiosk?._id} value={kiosk?._id}>
+                                    {kiosk?.name_of_center}
+                                  </option>
+                                ))}
                               </select>
                             </div>
                           </div>

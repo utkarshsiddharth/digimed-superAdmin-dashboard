@@ -146,6 +146,18 @@ export const SuperAdmin = createApi({
       }),
       invalidatesTags:["SuperAdmin"],
     }),
+    selectorganisation :builder.query({
+      query:(type)=>({
+        url:`/superAdmin/getOrganizations_kiosks_Dropdown?type=${type}`,
+        method:"GET",
+      })
+    }),
+    individualtoppotion : builder.query({
+      query:(orgId)=>({
+       url:`/superAdmin/getTopPortionAnalyticsForParticularOrganization/id=${orgId}`,
+       method:"GET"
+      })
+    })
   }),
 });
 
@@ -164,5 +176,7 @@ export const {
   useAdminProfileQuery,
   useUpdateProfileMutation,
   useLazyOveralldataQuery,
-  useAllAdminQuery
+  useAllAdminQuery,
+  useSelectorganisationQuery,
+  useIndividualtoppotionQuery
 } = SuperAdmin;
