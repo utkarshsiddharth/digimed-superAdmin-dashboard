@@ -6,7 +6,7 @@ export const SuperAdmin = createApi({
   reducerPath: "superAdmin",
   tagTypes: ["SuperAdmin", "deletetest"],
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://digi-med-backend.onrender.com",
+    baseUrl: "https://shatayu.online",
     // baseUrl: "https://shatayu.online",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");

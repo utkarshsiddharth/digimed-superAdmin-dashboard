@@ -5,7 +5,7 @@ export const UserAuthApi = createApi({
   reducerPath: "user-authentication",
   tagTypes: ["SuperAdmin"],
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://digi-med-backend.onrender.com",
+    baseUrl: "https://shatayu.online",
     // baseUrl: "https://shatayu.online",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
