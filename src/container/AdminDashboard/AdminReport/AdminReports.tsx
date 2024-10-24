@@ -2,20 +2,60 @@
 import { FC, Fragment, useEffect, useState } from "react";
 import { Card, CardHeader, Col, Nav, Row, Tab, Table } from "react-bootstrap";
 import {
+  useLazyGetStateWisePatientsQuery,
+  useIndividualtoppotionQuery,
   useLazyOveralldataQuery,
   useSelectorganisationQuery,
+  useLazyGetKiosksWisePatientsQuery,
+  useIndividualtoppotionKioskQuery,
+  useLazyKioskWiseConductedTestsQuery,
 } from "../../../redux/api/superAdmin";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import Loader from "../../../components/common/loader/loader";
+import AnimatedLogo from "../../../components/AnimatedLogo";
 interface AdminReportsProps {
   statesWithPatientsNo: Array<{ _id: string; count: number }>;
   totalpatientCount: number;
 }
 
 const AdminReports: FC<AdminReportsProps> = () => {
-  const [trigger, { data, error, isLoading }] = useLazyOveralldataQuery();
-  const [openCards, setOpenCards] = useState<any>([]);
+  const [trigger, { data, error, isLoading }] = useLazyOveralldataQuery<any>();
+  const [orgId, setOrgId] = useState(null);
 
+  const [selectedKioskId, setKioskId] = useState(null);
+  const [openCards, setOpenCards] = useState<any>([]);
+  const { data: orgdata } = useSelectorganisationQuery("organizations");
+  const { data: singleData, isFetching: singleDataLoding } =
+    useIndividualtoppotionQuery(orgId);
+  const { data: singleKioskData, isFetching: singleDataLodingKiosk } =
+    useIndividualtoppotionKioskQuery(selectedKioskId);
+  const [
+    triggerKioskWiseConductedTests,
+    { data: KioskWiseConductedTestsforIndivisual },
+  ] = useLazyKioskWiseConductedTestsQuery();
+
+  
+  const [
+    triggerGetStateWisePatients,
+    { data: StateWisePatients, isLoading: StateWisePatientsFetching },
+  ] = useLazyGetStateWisePatientsQuery();
+
+  const [
+    triggerGetKiosksWisePatients,
+    { data: KioskskWisePatients, isLoading: kisoskWiseLoading },
+  ] = useLazyGetKiosksWisePatientsQuery();
+
+  const { data: kioskData } = useSelectorganisationQuery("kiosks");
+  const [organizations, setOrganizations] = useState([]);
+  const [kiosksData, setKioskData] = useState([]);
+ 
   const toggleTable = (cardNumber: any) => {
+    if (orgId) {
+      // Trigger the lazy query manually when the table is toggled
+      triggerGetStateWisePatients(orgId);
+      triggerGetKiosksWisePatients(orgId);
+      triggerKioskWiseConductedTests(orgId);
+    }
     setOpenCards((prev: any) => {
       if (prev.includes(cardNumber)) {
         return prev.filter((number: any) => number !== cardNumber);
@@ -30,8 +70,26 @@ const AdminReports: FC<AdminReportsProps> = () => {
       statesWithPatientsNo: [],
       totalpatientCount: 0,
     });
+
+  const {
+    totalPatients = 0,
+    stateWithMostUser = { state: "Unknown", count: 0 },
+    // totalKiosksActiveHours = 0,
+    totalHoursConsultationProvided = 0,
+    kioksWisePatients = [],
+    kioskWiseConductedTests = [],
+  } = data?.data || {};
+
+  const totalHoursConsultationProvidedInHours = Math.floor(
+    totalHoursConsultationProvided / (3600 * 1000)
+  );
+  const totalMinutes1 = Math.floor(
+    (totalHoursConsultationProvided % (3600 * 1000)) / (60 * 1000)
+  );
+
   useEffect(() => {
     const fetchData = async () => {
+      // @ts-ignore 
       const response = await trigger();
       if (response.data && response.data.success) {
         const { statesWisePatients, totalpatientCount } = response.data.data;
@@ -41,61 +99,34 @@ const AdminReports: FC<AdminReportsProps> = () => {
         });
       }
     };
+
     fetchData();
   }, [trigger]);
+  // useEffect for organization data
+  useEffect(() => {
+    if (orgdata && orgdata.data) {
+      setOrganizations(orgdata.data);
+    }
+  }, [orgdata]);
+
+  // useEffect for kiosk data
+  useEffect(() => {
+    if (kioskData && kioskData.data) {
+      setKioskData(kioskData.data);
+    }
+  }, [kioskData]);
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
   }
+
   if (error) {
     return <div>Error fetching data</div>;
   }
-  const {
-    totalPatients = 0,
-    stateWithMostUser = { state: "Unknown", count: 0 },
-    // totalKiosksActiveHours = 0,
-    totalHoursConsultationProvided = 0,
-    kioksWisePatients = [],
-    kioskWiseConductedTests = [],
-  } = data?.data || {};
-  // const totalKiosksActiveHoursInHours = Math.floor(
-  //   totalKiosksActiveHours / (3600 * 1000)
-  // );
-  // const totalMinutes = Math.floor(
-  //   (totalKiosksActiveHours % (3600 * 1000)) / (60 * 1000)
-  // );
-  const totalHoursConsultationProvidedInHours = Math.floor(
-    totalHoursConsultationProvided / (3600 * 1000)
-  );
-  const totalMinutes1 = Math.floor(
-    (totalHoursConsultationProvided % (3600 * 1000)) / (60 * 1000)
-  );
-  // individual kiosk
-  const [selectedOrganization, setSelectedOrganization] = useState("");
-  const [selectedKiosk, setSelectedKiosk] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(false);
-  const { data: organizationsData, isLoading: orgsLoading } =
-    useSelectorganisationQuery("organizations");
-  const { data: kiosksData, isLoading: kiosksLoading } =
-    useSelectorganisationQuery("kiosks");
-  useEffect(() => {
-    if (!orgsLoading && !kiosksLoading) {
-      if (!organizationsData?.success || !kiosksData?.success) {
-        setFetchError(true);
-        setLoading(false);
-      } else {
-        setLoading(false);
-        setFetchError(false);
-      }
-    }
-  }, [orgsLoading, kiosksLoading, organizationsData, kiosksData]);
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-  if (fetchError) {
-    return <p>Error fetching data. Please try again later.</p>;
-  }
- 
   return (
     <Fragment>
       <Row>
@@ -452,17 +483,38 @@ const AdminReports: FC<AdminReportsProps> = () => {
                                   borderRadius: "5px",
                                   padding: "10px",
                                 }}
-                                value={selectedOrganization}
-                                onChange={(e) =>
-                                  setSelectedOrganization(e.target.value)
-                                }
+                                onChange={(e: any) => {
+                                  const selectedOrg: any = organizations.find(
+                                    (item: any) => item.name === e.target.value
+                                  );
+
+                                  setOrgId(selectedOrg?._id);
+                                  setKioskId(null);
+                                }}
                               >
-                                <option className="fs-15" value="">
-                                  All
-                                </option>
-                                {organizationsData?.data?.map((org: any) => (
-                                  <option key={org?._id} value={org?._id}>
-                                    {org?.name}
+                                {/* Static "All" option */}
+                                {orgId ? (
+                                  <option className="fs-15" value="">
+                                    Select Organization
+                                  </option>
+                                ) : (
+                                  <option
+                                    className="fs-15"
+                                    value=""
+                                    disabled
+                                    selected
+                                  >
+                                    Select Organization
+                                  </option>
+                                )}
+
+                                {organizations?.map((item: any, index) => (
+                                  <option
+                                    className="fs-15"
+                                    key={index}
+                                    value={item.name}
+                                  >
+                                    {item.name}
                                   </option>
                                 ))}
                               </select>
@@ -477,17 +529,38 @@ const AdminReports: FC<AdminReportsProps> = () => {
                                   borderRadius: "5px",
                                   padding: "10px",
                                 }}
-                                value={selectedKiosk}
-                                onChange={(e) =>
-                                  setSelectedKiosk(e.target.value)
-                                }
+                                onChange={(e: any) => {
+                                  const selectedKiosk: any = kiosksData.find(
+                                    (item: any) =>
+                                      item.name_of_center === e.target.value
+                                  );
+
+                                  setKioskId(selectedKiosk?._id);
+                                  setOrgId(null);
+                                }}
                               >
-                                <option className="fs-15" value="">
-                                  All
-                                </option>
-                                {kiosksData?.data?.map((kiosk:any) => (
-                                  <option key={kiosk?._id} value={kiosk?._id}>
-                                    {kiosk?.name_of_center}
+                                {/* Static "All" option */}
+                                {selectedKioskId ? (
+                                  <option className="fs-15" value="">
+                                    Select Kiosk
+                                  </option>
+                                ) : (
+                                  <option
+                                    className="fs-15"
+                                    value=""
+                                    disabled
+                                    selected
+                                  >
+                                    Select Kiosk
+                                  </option>
+                                )}
+                                {kiosksData?.map((item: any, index) => (
+                                  <option
+                                    className="fs-15"
+                                    key={index}
+                                    value={item?.name_of_center}
+                                  >
+                                    {item?.name_of_center}
                                   </option>
                                 ))}
                               </select>
@@ -499,246 +572,430 @@ const AdminReports: FC<AdminReportsProps> = () => {
                       <CardHeader className="d-flex justify-content-end">
                         <Col xl="3"></Col>
                       </CardHeader>
-                      <div className="d-flex justify-content-between">
-                        <Card className="custom-card p-3 hrm-main-cardd primary bg-light">
-                          <Card.Body>
-                            <div className="d-flex justify-content-center">
-                              <span className="fw-semibold fs-6">
-                                Total Number of Patients
-                              </span>
-                            </div>
-                            <div className="d-flex justify-content-center">
-                              <span className="fw-semibold fs-1 red-text">
-                                241
-                              </span>
-                            </div>
-                          </Card.Body>
-                        </Card>
-                        <Card className="custom-card p-3 hrm-main-cardd ms-4 bg-light primary">
-                          <Card.Body>
-                            <div className="d-flex justify-content-center">
-                              <span className="fw-semibold fs-6">
-                                State with most Active Users
-                              </span>
-                            </div>
-                            <div className="d-flex justify-content-center">
-                              <span className="fw-semibold fs-1 red-text">
-                                Delhi (37)
-                              </span>
-                            </div>
-                          </Card.Body>
-                        </Card>
-                      </div>
-                      <div className="d-flex justify-content-between">
-                        <Card className="custom-card p-3 hrm-main-cardd primary bg-light">
-                          <Card.Body>
-                            <div className="d-flex justify-content-center">
-                              <span className="fw-semibold fs-6">
-                                Total Hours Consultation
-                              </span>
-                            </div>
-                            <div className="d-flex justify-content-center">
-                              <span className="fw-semibold fs-1 red-text">
-                                120 Hours
-                              </span>
-                            </div>
-                          </Card.Body>
-                        </Card>
-                        <Card className="custom-card p-3 hrm-main-cardd ms-4 bg-light primary">
-                          <Card.Body>
-                            <div className="d-flex justify-content-center">
-                              <span className="fw-semibold fs-6">
-                                Total Hours Kiosk is Active
-                              </span>
-                            </div>
-                            <div className="d-flex justify-content-center">
-                              <span className="fw-semibold fs-1 red-text">
-                                168 Hours
-                              </span>
-                            </div>
-                          </Card.Body>
-                        </Card>
-                      </div>
-                      <Card className="custom-card hrm-main-cardd primary">
-                        <div className="position-relative">
-                          <div
-                            className="d-flex justify-content-end justify-item-center"
-                            onClick={() => toggleTable(1)}
-                            style={{ cursor: "pointer" }}
-                          >
-                            {openCards.includes(1) ? (
-                              <FaChevronUp className="fs-2 mt-4" />
-                            ) : (
-                              <FaChevronDown className="fs-2 mt-4" />
-                            )}
-                          </div>
-                        </div>
-                        <h1 className="fw-bold fs-6 mt-2">
-                          Number of Patients State Wise
-                        </h1>
-                        <h1 className="red-text fw-bolder ">241</h1>
 
-                        <div className="table-responsive">
-                          {openCards.includes(1) && (
+                      {orgId || selectedKioskId ? (
+                        <div>
+                          {singleDataLoding || singleDataLodingKiosk ? (
+                            <AnimatedLogo />
+                          ) : (
                             <>
-                              <Table className="table text-nowrap">
-                                <thead>
-                                  <tr>
-                                    <td scope="col" className="fw-bold fs-6">
-                                      S.No
-                                    </td>
-                                    <td scope="col" className="fw-bold fs-6">
-                                      State
-                                    </td>
-                                    <td scope="col" className="fw-bold fs-6">
-                                      Number of Patients
-                                    </td>
-                                  </tr>
-                                </thead>
-                                <tbody className="table-group-divider">
-                                  <tr>
-                                    <td>1.</td>
-                                    <td scope="row">Andhra Pradesh</td>
-                                    <td>10</td>
-                                  </tr>
-                                  <tr>
-                                    <td>2.</td>
-                                    <td scope="row">Arunachal Pradesh</td>
-                                    <td>20</td>
-                                  </tr>
-                                  <tr>
-                                    <td>3.</td>
-                                    <td scope="row">Assam</td>
-                                    <td>15</td>
-                                  </tr>
-                                </tbody>
-                              </Table>
+                              <div className="d-flex justify-content-between">
+                                <Card className="custom-card p-3 hrm-main-cardd primary bg-light">
+                                  <Card.Body>
+                                    <div className="d-flex justify-content-center">
+                                      <span className="fw-semibold fs-6">
+                                        Total Number of Patients
+                                      </span>
+                                    </div>
+                                    <div className="d-flex justify-content-center">
+                                      <span className="fw-semibold fs-1 red-text">
+                                        {orgId
+                                          ? singleData?.data?.totalPatients
+                                          : singleKioskData?.data
+                                              ?.totalPatients}
+                                      </span>
+                                    </div>
+                                  </Card.Body>
+                                </Card>
+                                {orgId && (
+                                  <Card className="custom-card p-3 hrm-main-cardd ms-4 bg-light primary">
+                                    <Card.Body>
+                                      <div className="d-flex justify-content-center">
+                                        <span className="fw-semibold fs-6">
+                                          State with most Active Users
+                                        </span>
+                                      </div>
+                                      <div className="d-flex justify-content-center">
+                                        <span className="fw-semibold fs-1 red-text">
+                                          {singleData?.data
+                                            ?.stateWithMostUser ? (
+                                            <>
+                                              {
+                                                singleData?.data
+                                                  ?.stateWithMostUser?.state
+                                              }{" "}
+                                              (
+                                              {
+                                                singleData?.data
+                                                  ?.stateWithMostUser?.count
+                                              }
+                                              )
+                                            </>
+                                          ) : (
+                                            ""
+                                          )}
+                                        </span>
+                                      </div>
+                                    </Card.Body>
+                                  </Card>
+                                )}
+                              </div>
+                              <div className="d-flex justify-content-between">
+                                <Card className="custom-card p-3 hrm-main-cardd primary bg-light">
+                                  <Card.Body>
+                                    <div className="d-flex justify-content-center">
+                                      <span className="fw-semibold fs-6">
+                                        Total Hours Consultation
+                                      </span>
+                                    </div>
+                                    <div className="d-flex justify-content-center">
+                                      <span className="fw-semibold fs-1 red-text">
+                                        {orgId
+                                          ? (() => {
+                                              const totalMilliseconds =
+                                                singleData?.data
+                                                  ?.totalHoursConsultationProvided ||
+                                                0;
+                                              const totalHours = Math.floor(
+                                                totalMilliseconds / 3600000
+                                              ); // Convert to hours
+                                              const totalMinutes = Math.floor(
+                                                (totalMilliseconds % 3600000) /
+                                                  60000
+                                              ); // Convert remainder to minutes
+                                              return `${totalHours} hrs ${totalMinutes} minutes`;
+                                            })()
+                                          : (() => {
+                                              const totalMilliseconds =
+                                                singleKioskData?.data
+                                                  ?.totalHourConsultationProvided ||
+                                                0;
+                                              const totalHours = Math.floor(
+                                                totalMilliseconds / 3600000
+                                              ); // Convert to hours
+                                              const totalMinutes = Math.floor(
+                                                (totalMilliseconds % 3600000) /
+                                                  60000
+                                              ); // Convert remainder to minutes
+                                              return `${totalHours} hrs ${totalMinutes} minutes`;
+                                            })()}
+                                      </span>
+                                    </div>
+                                  </Card.Body>
+                                </Card>
+                              </div>
+                              {orgId && (
+                                <Card className="custom-card hrm-main-cardd primary">
+                                  <div className="position-relative">
+                                    <div
+                                      className="d-flex justify-content-end justify-item-center"
+                                      onClick={() => toggleTable(1)}
+                                      style={{ cursor: "pointer" }}
+                                    >
+                                      {openCards.includes(1) ? (
+                                        <FaChevronUp className="fs-2 mt-4" />
+                                      ) : (
+                                        <FaChevronDown className="fs-2 mt-4" />
+                                      )}
+                                    </div>
+                                  </div>
+                                  <h1 className="fw-bold fs-6 mt-2">
+                                    Number of Patients State Wise
+                                  </h1>
+                                  <h1 className="red-text fw-bolder">
+                                    {" "}
+                                    {StateWisePatients?.data?.reduce(
+                                      (total: number, item: any) =>
+                                        total + item.count,
+                                      0
+                                    )}
+                                  </h1>
+
+                                  <div className="table-responsive">
+                                    {openCards.includes(1) && (
+                                      <>
+                                        {StateWisePatientsFetching ? (
+                                          <AnimatedLogo />
+                                        ) : (
+                                          <Table className="table text-nowrap">
+                                            <thead>
+                                              <tr>
+                                                <td
+                                                  scope="col"
+                                                  className="fw-bold fs-6"
+                                                >
+                                                  S.No
+                                                </td>
+                                                <td
+                                                  scope="col"
+                                                  className="fw-bold fs-6"
+                                                >
+                                                  State
+                                                </td>
+                                                <td
+                                                  scope="col"
+                                                  className="fw-bold fs-6"
+                                                >
+                                                  Number of Patients
+                                                </td>
+                                              </tr>
+                                            </thead>
+
+                                            <tbody className="table-group-divider">
+                                              {StateWisePatients &&
+                                                StateWisePatients?.data?.map(
+                                                  (item: any, index: any) => (
+                                                    <tr>
+                                                      <td>{index + 1}</td>
+                                                      <td scope="row">
+                                                        {item?._id}
+                                                      </td>
+                                                      <td>{item?.count}</td>
+                                                    </tr>
+                                                  )
+                                                )}
+                                            </tbody>
+                                          </Table>
+                                        )}
+                                      </>
+                                    )}
+                                  </div>
+                                </Card>
+                              )}
+
+                              {orgId && (
+                                <Card className="custom-card hrm-main-cardd primary mt-5">
+                                  <div className="position-relative">
+                                    <div
+                                      className="d-flex justify-content-end justify-item-center"
+                                      onClick={() => toggleTable(2)}
+                                      style={{ cursor: "pointer" }}
+                                    >
+                                      {openCards.includes(2) ? (
+                                        <FaChevronUp className="fs-2 mt-4" />
+                                      ) : (
+                                        <FaChevronDown className="fs-2 mt-4" />
+                                      )}
+                                    </div>
+                                  </div>
+                                  <h1 className="fw-bold fs-6 mt-2">
+                                    Number of Patients Kiosks Wise
+                                  </h1>
+                                  <h1 className="red-text fw-bolder">
+                                    {KioskskWisePatients?.data?.reduce(
+                                      (total: number, item: any) =>
+                                        total + item.patientCount,
+                                      0
+                                    )}
+                                  </h1>
+
+                                  <div className="table-responsive">
+                                    {openCards.includes(2) && (
+                                      <>
+                                        {kisoskWiseLoading ? (
+                                          <AnimatedLogo />
+                                        ) : (
+                                          <Table className="table text-nowrap">
+                                            <thead>
+                                              <tr>
+                                                <td
+                                                  scope="col"
+                                                  className="fw-bold fs-6"
+                                                >
+                                                  S.No
+                                                </td>
+                                                <td
+                                                  scope="col"
+                                                  className="fw-bold fs-6"
+                                                >
+                                                  Kiosk
+                                                </td>
+                                                <td
+                                                  scope="col"
+                                                  className="fw-bold fs-6"
+                                                >
+                                                  State
+                                                </td>
+                                                <td
+                                                  scope="col"
+                                                  className="fw-bold fs-6"
+                                                >
+                                                  Number of Patients
+                                                </td>
+                                              </tr>
+                                            </thead>
+                                            <tbody className="table-group-divider">
+                                              {KioskskWisePatients &&
+                                                KioskskWisePatients?.data?.map(
+                                                  (item: any, index: any) => (
+                                                    <>
+                                                      <tr>
+                                                        <td>{index}</td>
+                                                        <td scope="row">
+                                                          {
+                                                            item?.kioskData
+                                                              ?.name_of_center
+                                                          }
+                                                        </td>
+                                                        <td scope="row">
+                                                          {
+                                                            item?.kioskData
+                                                              ?.state
+                                                          }
+                                                        </td>
+                                                        <td>
+                                                          {item?.patientCount}
+                                                        </td>
+                                                      </tr>
+                                                    </>
+                                                  )
+                                                )}
+                                            </tbody>
+                                          </Table>
+                                        )}
+                                      </>
+                                    )}
+                                  </div>
+                                </Card>
+                              )}
+                              <Card className="custom-card hrm-main-cardd primary mt-5">
+                                <div className="position-relative">
+                                  <div
+                                    className="d-flex justify-content-end justify-item-center"
+                                    onClick={() => toggleTable(3)} // Pass card number
+                                    style={{ cursor: "pointer" }}
+                                  >
+                                    {openCards.includes(3) ? ( // Check if the third card is open
+                                      <FaChevronUp className="fs-2 mt-4" />
+                                    ) : (
+                                      <FaChevronDown className="fs-2 mt-4" />
+                                    )}
+                                  </div>
+                                </div>
+                                <h1 className="fw-bold fs-6 mt-2">
+                                  Number of Test Conducted
+                                </h1>
+                                <h1 className="red-text fw-bolder">
+                                  {" "}
+                                  {orgId
+                                    ? KioskWiseConductedTestsforIndivisual?.data?.reduce(
+                                        (total: number, item: any) =>
+                                          total + item.completedTestsCount,
+                                        0
+                                      )
+                                    : singleKioskData?.data?.kioskWiseConductedTests?.kioskWiseConductedTests
+                                    .reduce(
+                                        (total: number, item: any) =>
+                                          total + item.completedTestsCount,
+                                        0
+                                      )}
+                                </h1>
+                                <div className="table-responsive">
+                                  {openCards.includes(3) && ( // Check if the third card is open
+                                    <>
+                                      {orgId ? (
+                                        <Table className="table text-nowrap">
+                                          <thead>
+                                            <tr>
+                                              <td
+                                                scope="col"
+                                                className="fw-bold fs-6"
+                                              >
+                                                S.No
+                                              </td>
+                                              <td
+                                                scope="col"
+                                                className="fw-bold fs-6"
+                                              >
+                                                Name Of Center
+                                              </td>
+                                              <td
+                                                scope="col"
+                                                className="fw-bold fs-6"
+                                              >
+                                                State
+                                              </td>
+                                              <td
+                                                scope="col"
+                                                className="fw-bold fs-6"
+                                              >
+                                                City
+                                              </td>
+                                              <td
+                                                scope="col"
+                                                className="fw-bold fs-6"
+                                              >
+                                                Count
+                                              </td>
+                                            </tr>
+                                          </thead>
+                                          <tbody className="table-group-divider">
+                                            {KioskWiseConductedTestsforIndivisual?.data?.map(
+                                              (item: any, index: any) => (
+                                                <tr>
+                                                  <td>{index + 1}</td>
+                                                  <td scope="row">
+                                                    {
+                                                      item?.kioskData
+                                                        ?.name_of_center
+                                                    }
+                                                  </td>
+                                                  <td scope="row">
+                                                    {item?.kioskData?.state}
+                                                  </td>
+                                                  <td scope="row">
+                                                    {item?.kioskData?.city}
+                                                  </td>
+
+                                                  <td>
+                                                    {item?.completedTestsCount}
+                                                  </td>
+                                                </tr>
+                                              )
+                                            )}
+                                          </tbody>
+                                        </Table>
+                                      ) : (
+                                        <Table className="table text-nowrap">
+                                          <thead>
+                                            <tr>
+                                              <td
+                                                scope="col"
+                                                className="fw-bold fs-6"
+                                              >
+                                                S.No
+                                              </td>
+                                              <td
+                                                scope="col"
+                                                className="fw-bold fs-6"
+                                              >
+                                                Test Name
+                                              </td>
+                                              <td
+                                                scope="col"
+                                                className="fw-bold fs-6"
+                                              >
+                                                Completed Test Count
+                                              </td>
+                                            </tr>
+                                          </thead>
+                                          <tbody className="table-group-divider">
+                                            {singleKioskData?.data?.kioskWiseConductedTests?.kioskWiseConductedTests?.map(
+                                              (item: any, index: any) => (
+                                                <tr>
+                                                  <td>{index + 1}</td>
+                                                  <td scope="row">
+                                                    {item?._id}
+                                                  </td>
+                                                  <td>
+                                                    {item?.completedTestsCount}
+                                                  </td>
+                                                </tr>
+                                              )
+                                            )}
+                                          </tbody>
+                                        </Table>
+                                      )}
+                                    </>
+                                  )}
+                                </div>
+                              </Card>
                             </>
                           )}
                         </div>
-                      </Card>
-                      <Card className="custom-card hrm-main-cardd primary mt-5">
-                        <div className="position-relative">
-                          <div
-                            className="d-flex justify-content-end justify-item-center"
-                            onClick={() => toggleTable(2)}
-                            style={{ cursor: "pointer" }}
-                          >
-                            {openCards.includes(2) ? (
-                              <FaChevronUp className="fs-2 mt-4" />
-                            ) : (
-                              <FaChevronDown className="fs-2 mt-4" />
-                            )}
-                          </div>
-                        </div>
-                        <h1 className="fw-bold fs-6 mt-2">
-                          Number of Patients Kiosks Wise
-                        </h1>
-                        <h1 className="red-text fw-bolder fs-1 ">241</h1>
-                        <div className="table-responsive">
-                          {openCards.includes(2) && (
-                            <>
-                              <Table className="table text-nowrap">
-                                <thead>
-                                  <tr>
-                                    <td scope="col" className="fw-bold fs-6">
-                                      S.No
-                                    </td>
-                                    <td scope="col" className="fw-bold fs-6">
-                                      Kiosk
-                                    </td>
-                                    <td scope="col" className="fw-bold fs-6">
-                                      State
-                                    </td>
-                                    <td scope="col" className="fw-bold fs-6">
-                                      Number of Patients
-                                    </td>
-                                  </tr>
-                                </thead>
-                                <tbody className="table-group-divider">
-                                  <tr>
-                                    <td>1.</td>
-                                    <td scope="row">Kiosk 1</td>
-                                    <td scope="row">Arunachal Pradesh</td>
-                                    <td>10</td>
-                                  </tr>
-                                  <tr>
-                                    <td>2.</td>
-                                    <td scope="row">Kiosk 2</td>
-                                    <td scope="row">Arunachal Pradesh</td>
-                                    <td>20</td>
-                                  </tr>
-                                  <tr>
-                                    <td>3.</td>
-                                    <td scope="row">Kiosk 3</td>
-                                    <td scope="row">Assam</td>
-                                    <td>2</td>
-                                  </tr>
-                                </tbody>
-                              </Table>
-                            </>
-                          )}
-                        </div>
-                      </Card>
-                      <Card className="custom-card hrm-main-cardd primary mt-5">
-                        <div className="position-relative">
-                          <div
-                            className="d-flex justify-content-end justify-item-center"
-                            onClick={() => toggleTable(3)} // Pass card number
-                            style={{ cursor: "pointer" }}
-                          >
-                            {openCards.includes(3) ? ( // Check if the third card is open
-                              <FaChevronUp className="fs-2 mt-4" />
-                            ) : (
-                              <FaChevronDown className="fs-2 mt-4" />
-                            )}
-                          </div>
-                        </div>
-                        <h1 className="fw-bold fs-6 mt-2">Number of Doctors</h1>
-                        <h1 className="red-text fw-bolder fs-1">40</h1>
-                        <div className="table-responsive">
-                          {openCards.includes(3) && ( // Check if the third card is open
-                            <Table className="table text-nowrap">
-                              <thead>
-                                <tr>
-                                  <td scope="col" className="fw-bold fs-6">
-                                    S.No
-                                  </td>
-                                  <td scope="col" className="fw-bold fs-6">
-                                    List of Doctors
-                                  </td>
-                                  <td scope="col" className="fw-bold fs-6">
-                                    State
-                                  </td>
-                                  <td scope="col" className="fw-bold fs-6">
-                                    Time Spent
-                                  </td>
-                                </tr>
-                              </thead>
-                              <tbody className="table-group-divider">
-                                <tr>
-                                  <td>1.</td>
-                                  <td scope="row">Dr. Rakshita</td>
-                                  <td>Chandigarh</td>
-                                  <td>01:20:02</td>
-                                </tr>
-                                <tr>
-                                  <td>2.</td>
-                                  <td scope="row">Dr. Ameer</td>
-                                  <td>Punjab</td>
-                                  <td>02:09:01</td>
-                                </tr>
-                                <tr>
-                                  <td>3.</td>
-                                  <td scope="row">Dr. Riya</td>
-                                  <td>Haryana</td>
-                                  <td>02:09:01</td>
-                                </tr>
-                              </tbody>
-                            </Table>
-                          )}
-                        </div>
-                      </Card>
+                      ) : (
+                        ""
+                      )}
                     </Tab.Pane>
                   </Tab.Content>
                 </Tab.Container>

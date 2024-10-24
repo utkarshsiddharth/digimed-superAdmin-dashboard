@@ -24,22 +24,22 @@ export const SuperAdmin = createApi({
         url: `/superAdmin/get_doctors_or_kiosk_lists?page=${page}&limit=${limit}&type=${type}`,
         method: "GET",
       }),
-      providesTags:["SuperAdmin"],
+      providesTags: ["SuperAdmin"],
     }),
     doctorkList: builder.query({
-      query: ({page, limit, type }) => ({
+      query: ({ page, limit, type }) => ({
         url: `/superAdmin/get_doctors_or_kiosk_lists?page=${page}&limit=${limit}&type=${type}`,
         method: "GET",
       }),
-      providesTags:["SuperAdmin"],
+      providesTags: ["SuperAdmin"],
     }),
-    
-   organizationkList: builder.query({
+
+    organizationkList: builder.query({
       query: ({ page, limit, key }) => ({
         url: `/superAdmin/getOrganizations?key=${key}&page=${page}&limit=${limit}`,
         method: "GET",
       }),
-      providesTags:["SuperAdmin"],
+      providesTags: ["SuperAdmin"],
     }),
     doctorksingalData: builder.query({
       query: ({ selectedId, data }) => ({
@@ -47,7 +47,7 @@ export const SuperAdmin = createApi({
         // /admin/getDoctorOrKioksDataById?type=kiosks&id=6645c182821e914245ccf085.
         method: "GET",
       }),
-      providesTags:["SuperAdmin"],
+      providesTags: ["SuperAdmin"],
     }),
     // update doctor Profile?
     updateDoctorProfile: builder.mutation({
@@ -78,14 +78,14 @@ export const SuperAdmin = createApi({
         // /admin/getDoctorOrKioksDataById?type=kiosks&id=6645c182821e914245ccf085.
         method: "GET",
       }),
-      providesTags:["SuperAdmin"],
+      providesTags: ["SuperAdmin"],
     }),
     koiskloctionlist: builder.query({
       query: () => ({
         url: `/superAdmin/getKiosksCities`,
         method: "GET",
       }),
-      providesTags:["SuperAdmin"],
+      providesTags: ["SuperAdmin"],
     }),
     // doctor and kiosk active inactive?
     activeStatus: builder.mutation({
@@ -95,7 +95,7 @@ export const SuperAdmin = createApi({
         method: "PATCH",
         body: statusData,
       }),
-      invalidatesTags:["SuperAdmin"],
+      invalidatesTags: ["SuperAdmin"],
     }),
     // /admin/getloggedInAdmin
     adminProfile: builder.query({
@@ -103,65 +103,93 @@ export const SuperAdmin = createApi({
         url: `/superAdmin/getloggedInAdmin`,
         method: "GET",
       }),
-      providesTags:["SuperAdmin"],
+      providesTags: ["SuperAdmin"],
     }),
     UpdateProfile: builder.mutation({
-      query: ( formData ) => ({
+      query: (formData) => ({
         url: `/superAdmin/update_admin_profile_by_admin`,
         method: "PATCH",
         body: formData,
       }),
-      invalidatesTags:["SuperAdmin"],
+      invalidatesTags: ["SuperAdmin"],
     }),
-    overalldata:builder.query({
-      query:()=>({
-        url:`/superAdmin/getAnalytics`,
-        method:"GET",
-      })
-      
-    }),
-   
-    allAdmin:builder.query({
-      query:(id)=>({
-        url:`/superAdmin/getAdminsList/${id}`,
-        method:"GET",
+    overalldata: builder.query({
+      query: () => ({
+        url: `/superAdmin/getAnalytics`,
+        method: "GET",
       }),
-      providesTags:["SuperAdmin"],
+    }),
+
+    allAdmin: builder.query({
+      query: (id) => ({
+        url: `/superAdmin/getAdminsList/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["SuperAdmin"],
     }),
     // dddddd
 
     addAdmin: builder.mutation({
-      query: ( formData ) => ({
+      query: (formData) => ({
         url: `/superAdmin/add_admin`,
         method: "post",
         body: formData,
       }),
-      invalidatesTags:["SuperAdmin"],
+      invalidatesTags: ["SuperAdmin"],
     }),
     updateAdmin: builder.mutation({
-      query: ({id, formData} ) => ({
+      query: ({ id, formData }) => ({
         url: `/superAdmin/editAdmin${id}`,
         method: "post",
         body: formData,
       }),
-      invalidatesTags:["SuperAdmin"],
+      invalidatesTags: ["SuperAdmin"],
     }),
-    selectorganisation :builder.query({
-      query:(type)=>({
-        url:`/superAdmin/getOrganizations_kiosks_Dropdown?type=${type}`,
-        method:"GET",
-      })
+    selectorganisation: builder.query({
+      query: (type) => ({
+        url: `/superAdmin/getOrganizations_kiosks_Dropdown?type=${type}`,
+        method: "GET",
+      }),
     }),
-    individualtoppotion : builder.query({
-      query:(orgId)=>({
-       url:`/superAdmin/getTopPortionAnalyticsForParticularOrganization/id=${orgId}`,
-       method:"GET"
-      })
-    })
+    individualtoppotion: builder.query({
+      query: (orgId) => ({
+        url: `/superAdmin/getTopPortionAnalyticsForParticularOrganization/${orgId}`,
+        method: "GET",
+      }),
+    }),
+    individualtoppotionKiosk: builder.query({
+      query: (orgId) => ({
+        url: `/superAdmin/getAnalyticsForParticularKiosk/${orgId}`,
+        method: "GET",
+      }),
+    }),
+
+    getStateWisePatients: builder.query({
+      query: (orgId) => ({
+        url: `/superAdmin/getStateWisePatientsNoForParticularOrganization/${orgId}`,
+        method: "GET",
+      }),
+    }),
+    getKiosksWisePatients: builder.query({
+      query: (orgId) => ({
+        url: `/superAdmin/getKioskWisePatientsNoForParticularOrganization/${orgId}`,
+        method: "GET",
+      }),
+    }),
+    KioskWiseConductedTests: builder.query({
+      query: (orgId) => ({
+        url: `/superAdmin/getKioskWiseConductedTestsNoForParticularOrganization/${orgId}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
 export const {
+  useIndividualtoppotionKioskQuery,
+  useLazyGetKiosksWisePatientsQuery,
+useLazyKioskWiseConductedTestsQuery,
+  useLazyGetStateWisePatientsQuery,
   useUpdateAdminMutation,
   useAddAdminMutation,
   useOrganizationkListQuery,
@@ -178,5 +206,5 @@ export const {
   useLazyOveralldataQuery,
   useAllAdminQuery,
   useSelectorganisationQuery,
-  useIndividualtoppotionQuery
+  useIndividualtoppotionQuery,
 } = SuperAdmin;
