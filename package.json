@@ -104,6 +104,7 @@
     "sweetalert2": "^11.9.0",
     "swiper": "^11.0.3",
     "twilio-video": "^2.28.1",
+    "xlsx": "^0.18.5",
     "yet-another-react-lightbox": "^3.14.0",
     "yup": "^1.4.0"
   },

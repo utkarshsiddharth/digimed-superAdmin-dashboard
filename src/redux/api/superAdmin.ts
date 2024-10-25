@@ -6,6 +6,8 @@ export const SuperAdmin = createApi({
   reducerPath: "superAdmin",
   tagTypes: ["SuperAdmin", "deletetest"],
   baseQuery: fetchBaseQuery({
+
+    
     baseUrl: "https://shatayu.online",
     // baseUrl: "https://shatayu.online",
     prepareHeaders: (headers) => {
@@ -30,6 +32,7 @@ export const SuperAdmin = createApi({
       query: ({ page, limit, type }) => ({
         url: `/superAdmin/get_doctors_or_kiosk_lists?page=${page}&limit=${limit}&type=${type}`,
         method: "GET",
+
       }),
       providesTags: ["SuperAdmin"],
     }),

@@ -1,6 +1,6 @@
 /* eslint-disable linebreak-style */
 import { FC, Fragment, useEffect, useState } from "react";
-import { Card, CardHeader, Col, Nav, Row, Tab, Table } from "react-bootstrap";
+import {  Card, CardHeader, Col, Nav, Row, Tab, Table } from "react-bootstrap";
 import {
   useLazyGetStateWisePatientsQuery,
   useIndividualtoppotionQuery,
@@ -13,6 +13,7 @@ import {
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import Loader from "../../../components/common/loader/loader";
 import AnimatedLogo from "../../../components/AnimatedLogo";
+
 interface AdminReportsProps {
   statesWithPatientsNo: Array<{ _id: string; count: number }>;
   totalpatientCount: number;
@@ -20,6 +21,7 @@ interface AdminReportsProps {
 
 const AdminReports: FC<AdminReportsProps> = () => {
   const [trigger, { data, error, isLoading }] = useLazyOveralldataQuery<any>();
+  
   const [orgId, setOrgId] = useState(null);
 
   const [selectedKioskId, setKioskId] = useState(null);
@@ -34,7 +36,6 @@ const AdminReports: FC<AdminReportsProps> = () => {
     { data: KioskWiseConductedTestsforIndivisual },
   ] = useLazyKioskWiseConductedTestsQuery();
 
-  
   const [
     triggerGetStateWisePatients,
     { data: StateWisePatients, isLoading: StateWisePatientsFetching },
@@ -48,10 +49,9 @@ const AdminReports: FC<AdminReportsProps> = () => {
   const { data: kioskData } = useSelectorganisationQuery("kiosks");
   const [organizations, setOrganizations] = useState([]);
   const [kiosksData, setKioskData] = useState([]);
- 
+  console.log("overall", data)
   const toggleTable = (cardNumber: any) => {
     if (orgId) {
-      // Trigger the lazy query manually when the table is toggled
       triggerGetStateWisePatients(orgId);
       triggerGetKiosksWisePatients(orgId);
       triggerKioskWiseConductedTests(orgId);
@@ -65,6 +65,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
     });
   };
 
+  
   const [statesWithPatientsNoData, setStatesWithPatientsNoData] =
     useState<AdminReportsProps>({
       statesWithPatientsNo: [],
@@ -89,7 +90,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // @ts-ignore 
+      // @ts-ignore
       const response = await trigger();
       if (response.data && response.data.success) {
         const { statesWisePatients, totalpatientCount } = response.data.data;
@@ -127,6 +128,9 @@ const AdminReports: FC<AdminReportsProps> = () => {
   if (error) {
     return <div>Error fetching data</div>;
   }
+
+  
+
   return (
     <Fragment>
       <Row>
@@ -139,9 +143,6 @@ const AdminReports: FC<AdminReportsProps> = () => {
           </Card>
           <Col xl={12}>
             <Card className="custom-card">
-              {/* <Card.Header>                           
-                <Card.Title>Data</Card.Title>
-              </Card.Header> */}
               <Card.Body>
                 <Tab.Container id="left-tabs-example" defaultActiveKey="first">
                   <Nav
@@ -171,6 +172,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
                       eventKey="first"
                     >
                       <div className="d-flex justify-content-between">
+      
                         <Card className="custom-card p-3 hrm-main-cardd primary bg-light">
                           <Card.Body>
                             <div className="d-flex justify-content-center">
@@ -194,7 +196,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
                             </div>
                             <div className="d-flex justify-content-center">
                               <span className="fw-semibold fs-1 red-text mt-1">
-                                {stateWithMostUser?.state}{" "}
+                                {stateWithMostUser?.state}
                                 {stateWithMostUser?.count}
                               </span>
                             </div>
@@ -487,6 +489,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
                                   const selectedOrg: any = organizations.find(
                                     (item: any) => item.name === e.target.value
                                   );
+                                  setOpenCards([]);
 
                                   setOrgId(selectedOrg?._id);
                                   setKioskId(null);
@@ -534,6 +537,7 @@ const AdminReports: FC<AdminReportsProps> = () => {
                                     (item: any) =>
                                       item.name_of_center === e.target.value
                                   );
+                                  setOpenCards([]);
 
                                   setKioskId(selectedKiosk?._id);
                                   setOrgId(null);
@@ -692,14 +696,6 @@ const AdminReports: FC<AdminReportsProps> = () => {
                                   <h1 className="fw-bold fs-6 mt-2">
                                     Number of Patients State Wise
                                   </h1>
-                                  <h1 className="red-text fw-bolder">
-                                    {" "}
-                                    {StateWisePatients?.data?.reduce(
-                                      (total: number, item: any) =>
-                                        total + item.count,
-                                      0
-                                    )}
-                                  </h1>
 
                                   <div className="table-responsive">
                                     {openCards.includes(1) && (
@@ -707,45 +703,55 @@ const AdminReports: FC<AdminReportsProps> = () => {
                                         {StateWisePatientsFetching ? (
                                           <AnimatedLogo />
                                         ) : (
-                                          <Table className="table text-nowrap">
-                                            <thead>
-                                              <tr>
-                                                <td
-                                                  scope="col"
-                                                  className="fw-bold fs-6"
-                                                >
-                                                  S.No
-                                                </td>
-                                                <td
-                                                  scope="col"
-                                                  className="fw-bold fs-6"
-                                                >
-                                                  State
-                                                </td>
-                                                <td
-                                                  scope="col"
-                                                  className="fw-bold fs-6"
-                                                >
-                                                  Number of Patients
-                                                </td>
-                                              </tr>
-                                            </thead>
+                                          <>
+                                            <h1 className="red-text fw-bolder">
+                                              {" "}
+                                              {StateWisePatients?.data?.reduce(
+                                                (total: number, item: any) =>
+                                                  total + item.count,
+                                                0
+                                              )}
+                                            </h1>
+                                            <Table className="table text-nowrap">
+                                              <thead>
+                                                <tr>
+                                                  <td
+                                                    scope="col"
+                                                    className="fw-bold fs-6"
+                                                  >
+                                                    S.No
+                                                  </td>
+                                                  <td
+                                                    scope="col"
+                                                    className="fw-bold fs-6"
+                                                  >
+                                                    State
+                                                  </td>
+                                                  <td
+                                                    scope="col"
+                                                    className="fw-bold fs-6"
+                                                  >
+                                                    Number of Patients
+                                                  </td>
+                                                </tr>
+                                              </thead>
 
-                                            <tbody className="table-group-divider">
-                                              {StateWisePatients &&
-                                                StateWisePatients?.data?.map(
-                                                  (item: any, index: any) => (
-                                                    <tr>
-                                                      <td>{index + 1}</td>
-                                                      <td scope="row">
-                                                        {item?._id}
-                                                      </td>
-                                                      <td>{item?.count}</td>
-                                                    </tr>
-                                                  )
-                                                )}
-                                            </tbody>
-                                          </Table>
+                                              <tbody className="table-group-divider">
+                                                {StateWisePatients &&
+                                                  StateWisePatients?.data?.map(
+                                                    (item: any, index: any) => (
+                                                      <tr>
+                                                        <td>{index + 1}</td>
+                                                        <td scope="row">
+                                                          {item?._id}
+                                                        </td>
+                                                        <td>{item?.count}</td>
+                                                      </tr>
+                                                    )
+                                                  )}
+                                              </tbody>
+                                            </Table>
+                                          </>
                                         )}
                                       </>
                                     )}
@@ -771,13 +777,6 @@ const AdminReports: FC<AdminReportsProps> = () => {
                                   <h1 className="fw-bold fs-6 mt-2">
                                     Number of Patients Kiosks Wise
                                   </h1>
-                                  <h1 className="red-text fw-bolder">
-                                    {KioskskWisePatients?.data?.reduce(
-                                      (total: number, item: any) =>
-                                        total + item.patientCount,
-                                      0
-                                    )}
-                                  </h1>
 
                                   <div className="table-responsive">
                                     {openCards.includes(2) && (
@@ -785,63 +784,74 @@ const AdminReports: FC<AdminReportsProps> = () => {
                                         {kisoskWiseLoading ? (
                                           <AnimatedLogo />
                                         ) : (
-                                          <Table className="table text-nowrap">
-                                            <thead>
-                                              <tr>
-                                                <td
-                                                  scope="col"
-                                                  className="fw-bold fs-6"
-                                                >
-                                                  S.No
-                                                </td>
-                                                <td
-                                                  scope="col"
-                                                  className="fw-bold fs-6"
-                                                >
-                                                  Kiosk
-                                                </td>
-                                                <td
-                                                  scope="col"
-                                                  className="fw-bold fs-6"
-                                                >
-                                                  State
-                                                </td>
-                                                <td
-                                                  scope="col"
-                                                  className="fw-bold fs-6"
-                                                >
-                                                  Number of Patients
-                                                </td>
-                                              </tr>
-                                            </thead>
-                                            <tbody className="table-group-divider">
-                                              {KioskskWisePatients &&
-                                                KioskskWisePatients?.data?.map(
-                                                  (item: any, index: any) => (
-                                                    <>
-                                                      <tr>
-                                                        <td>{index}</td>
-                                                        <td scope="row">
-                                                          {
-                                                            item?.kioskData
-                                                              ?.name_of_center
-                                                          }
-                                                        </td>
-                                                        <td scope="row">
-                                                          {
-                                                            item?.kioskData
-                                                              ?.state
-                                                          }
-                                                        </td>
-                                                        <td>
-                                                          {item?.patientCount}
-                                                        </td>
-                                                      </tr>
-                                                    </>
-                                                  )
+                                          <>
+                                            <>
+                                              <h1 className="red-text fw-bolder">
+                                                {KioskskWisePatients?.data?.reduce(
+                                                  (total: number, item: any) =>
+                                                    total + item.patientCount,
+                                                  0
                                                 )}
-                                            </tbody>
-                                          </Table>
+                                              </h1>
+                                            </>
+                                            <Table className="table text-nowrap">
+                                              <thead>
+                                                <tr>
+                                                  <td
+                                                    scope="col"
+                                                    className="fw-bold fs-6"
+                                                  >
+                                                    S.No
+                                                  </td>
+                                                  <td
+                                                    scope="col"
+                                                    className="fw-bold fs-6"
+                                                  >
+                                                    Kiosk
+                                                  </td>
+                                                  <td
+                                                    scope="col"
+                                                    className="fw-bold fs-6"
+                                                  >
+                                                    State
+                                                  </td>
+                                                  <td
+                                                    scope="col"
+                                                    className="fw-bold fs-6"
+                                                  >
+                                                    Number of Patients
+                                                  </td>
+                                                </tr>
+                                              </thead>
+                                              <tbody className="table-group-divider">
+                                                {KioskskWisePatients &&
+                                                  KioskskWisePatients?.data?.map(
+                                                    (item: any, index: any) => (
+                                                      <>
+                                                        <tr>
+                                                          <td>{index}</td>
+                                                          <td scope="row">
+                                                            {
+                                                              item?.kioskData
+                                                                ?.name_of_center
+                                                            }
+                                                          </td>
+                                                          <td scope="row">
+                                                            {
+                                                              item?.kioskData
+                                                                ?.state
+                                                            }
+                                                          </td>
+                                                          <td>
+                                                            {item?.patientCount}
+                                                          </td>
+                                                        </tr>
+                                                      </>
+                                                    )
+                                                  )}
+                                              </tbody>
+                                            </Table>
+                                          </>
                                         )}
                                       </>
                                     )}
@@ -865,86 +875,92 @@ const AdminReports: FC<AdminReportsProps> = () => {
                                 <h1 className="fw-bold fs-6 mt-2">
                                   Number of Test Conducted
                                 </h1>
-                                <h1 className="red-text fw-bolder">
-                                  {" "}
-                                  {orgId
-                                    ? KioskWiseConductedTestsforIndivisual?.data?.reduce(
-                                        (total: number, item: any) =>
-                                          total + item.completedTestsCount,
-                                        0
-                                      )
-                                    : singleKioskData?.data?.kioskWiseConductedTests?.kioskWiseConductedTests
-                                    .reduce(
-                                        (total: number, item: any) =>
-                                          total + item.completedTestsCount,
-                                        0
-                                      )}
-                                </h1>
+                               
                                 <div className="table-responsive">
                                   {openCards.includes(3) && ( // Check if the third card is open
                                     <>
                                       {orgId ? (
-                                        <Table className="table text-nowrap">
-                                          <thead>
-                                            <tr>
-                                              <td
-                                                scope="col"
-                                                className="fw-bold fs-6"
-                                              >
-                                                S.No
-                                              </td>
-                                              <td
-                                                scope="col"
-                                                className="fw-bold fs-6"
-                                              >
-                                                Name Of Center
-                                              </td>
-                                              <td
-                                                scope="col"
-                                                className="fw-bold fs-6"
-                                              >
-                                                State
-                                              </td>
-                                              <td
-                                                scope="col"
-                                                className="fw-bold fs-6"
-                                              >
-                                                City
-                                              </td>
-                                              <td
-                                                scope="col"
-                                                className="fw-bold fs-6"
-                                              >
-                                                Count
-                                              </td>
-                                            </tr>
-                                          </thead>
-                                          <tbody className="table-group-divider">
-                                            {KioskWiseConductedTestsforIndivisual?.data?.map(
-                                              (item: any, index: any) => (
-                                                <tr>
-                                                  <td>{index + 1}</td>
-                                                  <td scope="row">
-                                                    {
-                                                      item?.kioskData
-                                                        ?.name_of_center
-                                                    }
-                                                  </td>
-                                                  <td scope="row">
-                                                    {item?.kioskData?.state}
-                                                  </td>
-                                                  <td scope="row">
-                                                    {item?.kioskData?.city}
-                                                  </td>
+                                        <>
+                                          <h1 className="red-text fw-bolder">
+                                            {" "}
+                                            {orgId
+                                              ? KioskWiseConductedTestsforIndivisual?.data?.reduce(
+                                                  (total: number, item: any) =>
+                                                    total +
+                                                    item.completedTestsCount,
+                                                  0
+                                                )
+                                              : singleKioskData?.data?.kioskWiseConductedTests?.kioskWiseConductedTests.reduce(
+                                                  (total: number, item: any) =>
+                                                    total +
+                                                    item.completedTestsCount,
+                                                  0
+                                                )}
+                                          </h1>
+                                          <Table className="table text-nowrap">
+                                            <thead>
+                                              <tr>
+                                                <td
+                                                  scope="col"
+                                                  className="fw-bold fs-6"
+                                                >
+                                                  S.No
+                                                </td>
+                                                <td
+                                                  scope="col"
+                                                  className="fw-bold fs-6"
+                                                >
+                                                  Name Of Center
+                                                </td>
+                                                <td
+                                                  scope="col"
+                                                  className="fw-bold fs-6"
+                                                >
+                                                  State
+                                                </td>
+                                                <td
+                                                  scope="col"
+                                                  className="fw-bold fs-6"
+                                                >
+                                                  City
+                                                </td>
+                                                <td
+                                                  scope="col"
+                                                  className="fw-bold fs-6"
+                                                >
+                                                  Count
+                                                </td>
+                                              </tr>
+                                            </thead>
+                                            <tbody className="table-group-divider">
+                                              {KioskWiseConductedTestsforIndivisual?.data?.map(
+                                                (item: any, index: any) => (
+                                                  <tr>
+                                                    <td>{index + 1}</td>
+                                                    <td scope="row">
+                                                      {
+                                                        item?.kioskData
+                                                          ?.name_of_center
+                                                      }
+                                                    </td>
+                                                    <td scope="row">
+                                                      {item?.kioskData?.state}
+                                                    </td>
+                                                    <td scope="row">
+                                                      {item?.kioskData?.city}
+                                                    </td>
 
-                                                  <td>
-                                                    {item?.completedTestsCount}
-                                                  </td>
-                                                </tr>
-                                              )
-                                            )}
-                                          </tbody>
-                                        </Table>
+                                                    <td>
+                                                      {
+                                                        item?.completedTestsCount
+                                                      }
+                                                    </td>
+                                                  </tr>
+                                                )
+                                              )}
+                                            </tbody>
+                                          </Table>
+                                        </>
                                       ) : (
                                         <Table className="table text-nowrap">
                                           <thead>
